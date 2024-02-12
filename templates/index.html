@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Generator</title>
+</head>
+<body>
+    <!-- <form action="/generate_code" method="post">
+        <label for="code_prompt">Enter some code prompt:</label>
+        <input type="text" id="code_prompt" name="code_prompt" required>
+        <button type="submit">Generate Code</button>
+    </form> -->
+
+    <form id="chat-form">
+        <label for="user_message">Your message:</label>
+        <input type="text" id="user_message" name="user_message" required>
+        <button type="button" onclick="sendMessage()">Send Message</button>
+    </form>
+
+    <div id="result-container">
+        <!-- This is where the generated code will be displayed -->
+    </div>
+
+    <script>
+        function sendMessage() {
+            var userMessage = document.getElementById('user_message').value;
+            document.getElementById('user_message').value = ''; // Clear the input field
+        
+            fetch('/generate_code', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    'user_message': userMessage
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Received data:', data); // Log the received data for debugging
+    
+                // Check if model_response is present in the data
+                if (data && data.model_response !== undefined) {
+                    // Append model response to the result container
+                    var resultContainer = document.getElementById('result-container');
+                    resultContainer.innerHTML += '<h2>Generated Code:</h2><pre>' + data.model_response + '</pre>';
+                } else {
+                    throw new Error('Invalid response from the server');
+                }
+            })
+            .catch(error => {
+                // Display error on the page
+                var resultContainer = document.getElementById('result-container');
+                resultContainer.innerHTML += '<h2>Error:</h2><p>' + error.message + '</p>';
+            });
+        }
+    </script>
+    
+</body>
+</html>
+
+
+
