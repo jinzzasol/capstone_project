@@ -1,0 +1,25 @@
+/* DescriptionBox.css */
+.description-box {
+  background-color: #1e1e1e; 
+  color: white;
+  height: 850px;
+}
+
+.description-tab {
+  background-color: #333;
+  padding: 8px 16px; 
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px; 
+  font-weight: bold;
+}
+
+
+.description-box h2 {
+  padding: 16px; 
+  margin: 0; 
+}
+
+.description-box p {
+  padding: 0 16px 16px; 
+  margin: 0; 
+}

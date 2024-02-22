@@ -1,23 +1,24 @@
-import logo from './logo.svg';
+// App.js
+import React from 'react';
 import './App.css';
+import HeaderApp from './components/HeaderApp'; 
+import DescriptionBox from './components/DescriptionBox';
 
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <HeaderApp /> 
+      <div className="content">
+        <div className="left-container">
+          <DescriptionBox 
+            title="2. Add Two Numbers" 
+            description="You are given two non-empty linked lists representing two non-negative integers. The digits are stored in reverse order, and each of their nodes contains a single digit. Add the two numbers and return the sum as a linked list. You may assume the two numbers do not contain any leading zero, except the number 0 itself. Example 1: Input: l1 = [2,4,3], l2 = [5,6,4] Output: [7,0,8] Explanation: 342 + 465 = 807. Example 2: Input: l1 = [0], l2 = [0] Output: [0] Example 3: Input: l1 = [9,9,9,9,9,9,9], l2 = [9,9,9,9] Output: [8,9,9,9,0,0,0,1]"
+          />
+        </div>
+        <div className="right-container">
+          {/* Code editor  */}
+        </div>
+      </div>
     </div>
   );
 }
