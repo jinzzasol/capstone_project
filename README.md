@@ -1,3 +1,13 @@
+
+#added header and description box along with description tab and a sample question
+commit 078fa165856e4cd6ca8f4936f4e8f82952472de1 (HEAD -> feature/UI, origin/feature/UI)
+Author: Ayush Aggarwal <aayush98@vt.edu>
+Date:   Thu Feb 22 02:19:42 2024 -0500
+
+![alt text](image.png)
+
+    
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
