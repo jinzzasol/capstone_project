@@ -5,13 +5,19 @@
   box-sizing: border-box;
 
 }
+.content {
+  display: flex;
+}
+
+
+.right-container {
+  flex: 1; /* Assigns equal width to both containers */
+}
 
 .left-container{
   width: 50%;
 }
-.right-container {
-  width: 50%; 
-}
+
 
 .App-logo {
   height: 40vmin;

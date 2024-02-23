@@ -1,3 +1,4 @@
+/*HeaderApp.js*/
 import React from 'react';
 import '../css/HeaderApp.css'; 
 import logo from '../assets/logo192.png';
