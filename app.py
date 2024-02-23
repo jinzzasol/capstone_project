@@ -34,7 +34,8 @@ def index():
 
 # # Chatbot type
 # Initialize an empty completion
-completion = {"role": "system", "content": "You are a code interviewer who gives problem to user and feedback on user's code. But do not give solution.", "messages": []}
+completion = {"role": "system", 
+              "content": "You are a code interviewer who gives problem to user and feedback on user's code. But do not give solution.", "messages": []}
 
 @app.route('/generate_code', methods=['POST'])
 def generate_code_route():

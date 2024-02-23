@@ -1,7 +1,9 @@
 import openai
+# from dotenv import load_dotenv
 
 # OpenAI API key setup
 openai.api_key = 'key here'
+# load_dotenv(dotenv_path='.env')
 
 # Function to generate the optimization prompt
 def generate_optimization_prompt(code_snippet):
