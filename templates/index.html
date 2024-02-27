@@ -4,19 +4,52 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Code Generator</title>
+    <style>
+        .container {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+        }
+
+        #chat-form {
+            flex: 1;
+            margin-right: 10px;
+            float: right;
+            width: 500px;
+        }
+
+        #result-container {
+            flex: 1;
+            border: 1px solid black;
+            padding: 10px;
+            max-width: 800px; /* Adjust max-width as needed */
+            overflow: auto;
+            float: left;
+        }
+
+        @media (max-width: 700px) {
+            .container {
+                flex-direction: column;
+            }
+
+            #chat-form, #result-container {
+                margin-right: 0;
+                width: 100%;
+            }
+        }
+
+        
+    </style>
 </head>
 <body>
-    <!-- <form action="/generate_code" method="post">
-        <label for="code_prompt">Enter some code prompt:</label>
-        <input type="text" id="code_prompt" name="code_prompt" required>
-        <button type="submit">Generate Code</button>
-    </form> -->
 
     <form id="chat-form">
-        <label for="user_message">Your message:</label>
-        <input type="text" id="user_message" name="user_message" required>
-        <button type="button" onclick="sendMessage()">Send Message</button>
+        <label for="user_message">Enter your message: <br></label>
+        <textarea id="user_message" name="user_message" required rows="10" cols="50"></textarea>
+        <br>
+        <button type="button" onclick="sendMessage()">Send Message (click!)</button>
     </form>
+    
 
     <div id="result-container">
         <!-- This is where the generated code will be displayed -->

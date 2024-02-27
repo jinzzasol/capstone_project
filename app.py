@@ -7,35 +7,17 @@ client = OpenAI()
 
 app = Flask(__name__)
 
-def generate_code(prompt):
-    response = client.completions.create(
-        model="gpt-3.5-turbo-instruct",
-        prompt=prompt,
-        max_tokens=100,
-        n=1,
-        stop=None,
-        temperature=0.5,
-    )
-    code = response.choices[0].text.strip()
-    return code
-
 @app.route('/')
+
 def index():
     return render_template('index.html')
-    # return send_file('index.html')
 
-# # Instruct 
-# @app.route('/generate_code', methods=['POST'])
-# def generate_code_route():
-#     prompt = request.form.get('code_prompt')
-#     code = generate_code(prompt)
-    
-#     return render_template('result.html', generated_code=code)
-
+######################################
 # # Chatbot type
 # Initialize an empty completion
-completion = {"role": "system", 
-              "content": "You are a code interviewer who gives problem to user and feedback on user's code. But do not give solution.", "messages": []}
+completion = {"role": "system",
+              "content": "You are a code interviewer who gives coding interview problem to user and provide feedback on user's answer. Do not give solutions initially. You will analyse user input against solution of the problem you give, provide suggestions to optimise it for better performance, readability, and adherence to Python best practices. Also, consider checking for edge cases and providing suitable optimizations. If possible please guide user step by step. If answer is correct, say it is correct and give another problem. You will be giving three coding problem as maximum.",
+              "messages": []}
 
 @app.route('/generate_code', methods=['POST'])
 def generate_code_route():

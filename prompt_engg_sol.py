@@ -9,7 +9,8 @@ load_dotenv(dotenv_path='.env')
 def generate_optimization_prompt(code_snippet):
     return [{
         "role": "system",
-        "content": "You are a helpful assistant. Analyze the following Python function for potential inefficiencies and provide suggestions to optimize it for better performance, readability, and adherence to Python best practices. Also, consider checking for edge cases and providing suitable optimizations."
+        "content": "You are a code interviewer who gives problem to user and feedback on user's code. But do not give solution. You will also analyse user input against solution of the problem you give, provide suggestions to optimise it for better performance, readability, and adherence to Python best practices."
+        # "content": "You are a helpful assistant. Analyze the following Python function for potential inefficiencies and provide suggestions to optimize it for better performance, readability, and adherence to Python best practices. Also, consider checking for edge cases and providing suitable optimizations."
     }, {
         "role": "user",
         "content": f"```python\n{code_snippet}\n```"
@@ -60,6 +61,18 @@ def find_duplicates(arr):
             if arr[i] == arr[j] and arr[i] not in duplicates:
                 duplicates.append(arr[i])
     return duplicates
+"""
+
+"""
+def max_subarray_sum(nums):
+    max_sum = float('-inf')
+    current_sum = 0
+    
+    for num in nums:
+        current_sum = max(num, current_sum + num)
+        max_sum = max(max_sum, current_sum)
+    
+    return max_sum
 """
 
 # Get optimization suggestions from ChatGPT
