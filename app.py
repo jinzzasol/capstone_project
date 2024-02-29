@@ -21,6 +21,17 @@ completion = {"role": "system",
               "messages": []
             }
 
+# Example user's code snippet
+user_code_snippet = """
+def find_duplicates(arr):
+    duplicates = []
+    for i in range(len(arr)):
+        for j in range(i + 1, len(arr)):
+            if arr[i] == arr[j] and arr[i] not in duplicates:
+                duplicates.append(arr[i])
+    return duplicates
+"""
+
 @app.route('/generate_code', methods=['POST'])
 def generate_code_route():
     user_message = request.form.get('user_message')
@@ -37,7 +48,7 @@ def generate_code_route():
                 model="gpt-3.5-turbo",
                 messages=completion['messages'],
                 temperature=0.3, # more deterministic
-                top_p=0.2,
+                # top_p=0.2,
             )
 
             # Extract and return the model's response

@@ -9,11 +9,11 @@ load_dotenv(dotenv_path='.env')
 def generate_optimization_prompt(code_snippet):
     return [{
         "role": "system",
-        "content": "You are a code interviewer who gives problem to user and feedback on user's code. But do not give solution. You will also analyse user input against solution of the problem you give, provide suggestions to optimise it for better performance, readability, and adherence to Python best practices."
-        # "content": "You are a helpful assistant. Analyze the following Python function for potential inefficiencies and provide suggestions to optimize it for better performance, readability, and adherence to Python best practices. Also, consider checking for edge cases and providing suitable optimizations."
+        # "content": "You are an AI coding interviewer who and provides feedback on users answers. Your role is to analyze user input against the solution of the given problem, offering corrections or suggestions to optimize it for better performance, readability, and adherence to Python best practices. Additionally, you should consider checking for edge cases and providing suitable optimizations. Instead of directly providing solutions, guide users step by step. Do not show the answer. If the answer is correct, acknowledge it as correct."
+        "content": "You are an AI coding interviewer tasked with analyzing user input against a given problem solution. Your role is to provide feedback to optimize code for performance, readability, and adherence to Python best practices. Your feedback may include acknowledging correct code, suggesting optimizations for performance and readability, and addressing edge cases. Encourage users to iterate on their code based on your feedback to achieve optimal solutions."
     }, {
         "role": "user",
-        "content": f"```python\n{code_snippet}\n```"
+        "content": f"This is my answer, have a look and give me a feedback according to your role; ```python\n{code_snippet}\n```"
     }]
 
 # Function to retrieve code optimizations using ChatGPT
@@ -40,17 +40,17 @@ def get_code_optimizations(code_snippet):
     except Exception as e:
         return f"Error: {str(e)}"
 
-# Interactive loop to communicate with the user
-while True:
-    user_code_snippet = input("Enter your Python code snippet (or type 'exit' to quit):\n")
+# # Interactive loop to communicate with the user
+# while True:
+#     user_code_snippet = input("Enter your Python code snippet (or type 'exit' to quit):\n")
     
-    if user_code_snippet.lower() == "exit":
-        print("Exiting...")
-        break
+#     if user_code_snippet.lower() == "exit":
+#         print("Exiting...")
+#         break
     
-    optimization_suggestions = get_code_optimizations(user_code_snippet)
-    print("\nOptimization Suggestions:\n", optimization_suggestions)
-    print("\n")  # Add a newline for better readability between snippets
+#     optimization_suggestions = get_code_optimizations(user_code_snippet)
+#     print("\nOptimization Suggestions:\n", optimization_suggestions)
+#     print("\n")  # Add a newline for better readability between snippets
 
 # Example user's code snippet
 user_code_snippet = """
@@ -63,17 +63,17 @@ def find_duplicates(arr):
     return duplicates
 """
 
-"""
-def max_subarray_sum(nums):
-    max_sum = float('-inf')
-    current_sum = 0
+# user_code_snippet = """
+# def max_subarray_sum(nums):
+#     max_sum = float('-inf')
+#     current_sum = 0
     
-    for num in nums:
-        current_sum = max(num, current_sum + num)
-        max_sum = max(max_sum, current_sum)
+#     for num in nums:
+#         current_sum = max(num, current_sum + num)
+#         max_sum = max(max_sum, current_sum)
     
-    return max_sum
-"""
+#     return max_sum
+# """
 
 # Get optimization suggestions from ChatGPT
 optimization_suggestions = get_code_optimizations(user_code_snippet)
