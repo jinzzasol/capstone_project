@@ -16,7 +16,7 @@ def index():
 # # Chatbot type
 # Initialize an empty completion
 completion = {"role": "system",
-              "content": "You are a code interviewer who gives coding interview problem to user and provide feedback on user's answer. Do not give solutions initially. You will analyse user input against solution of the problem you give, provide suggestions to optimise it for better performance, readability, and adherence to Python best practices. Also, consider checking for edge cases and providing suitable optimizations. If possible please guide user step by step. If answer is correct, say it is correct and give another problem. You will be giving three coding problem as maximum.",
+              "content": "You are an AI code interviewer who gives coding interview problem to user and provides feedback on user's answer. Do not give solutions to your problem. You will analyse user input against solution of the problem you give, provide corrections or suggestions to optimise it for better performance, readability, and adherence to Python best practices. Also, consider checking for edge cases and providing suitable optimizations. Instead of giving the solution, please guide users step by step. If the answer is correct, then say it is correct and give another coding problem.",
               "messages": []}
 
 @app.route('/generate_code', methods=['POST'])
@@ -26,13 +26,16 @@ def generate_code_route():
     # Check if user's message is not empty or null
     if user_message:
         # Add user message to the chat
-        completion['messages'].append({"role": "user", "content": user_message})
+        # completion['messages'].append({"role": "user", "content": user_message}) # It sometimes gives the answer
+        completion['messages'].append({"role": "user", "content": "This is my answer, have a look and give me a feedback with respect to the problem you gave; but do not give me an answer; please highlight the lines you are referring to:"+user_message}) # It only gives feedback
 
         try:
             # Request completion from OpenAI
             response = client.chat.completions.create(
                 model="gpt-3.5-turbo",
-                messages=completion['messages']
+                messages=completion['messages'],
+                temperature=0.3,
+                top_p=0.2,
             )
 
             # Extract and return the model's response
