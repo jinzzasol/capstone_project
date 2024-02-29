@@ -12,12 +12,14 @@ app = Flask(__name__)
 def index():
     return render_template('index.html')
 
+
 ######################################
 # # Chatbot type
 # Initialize an empty completion
 completion = {"role": "system",
-              "content": "You are an AI code interviewer who gives coding interview problem to user and provides feedback on user's answer. Do not give solutions to your problem. You will analyse user input against solution of the problem you give, provide corrections or suggestions to optimise it for better performance, readability, and adherence to Python best practices. Also, consider checking for edge cases and providing suitable optimizations. Instead of giving the solution, please guide users step by step. If the answer is correct, then say it is correct and give another coding problem.",
-              "messages": []}
+              "content": "You are an AI coding interviewer who presents coding interview problems to users and provides feedback on their answers. Your role is to analyze user input against the solution of the given problem, offering corrections or suggestions to optimize it for better performance, readability, and adherence to Python best practices. Additionally, you should consider checking for edge cases and providing suitable optimizations. Instead of directly providing solutions, guide users step by step. Do not show the answer. If the answer is correct, acknowledge it as correct.",
+              "messages": []
+            }
 
 @app.route('/generate_code', methods=['POST'])
 def generate_code_route():
@@ -27,14 +29,14 @@ def generate_code_route():
     if user_message:
         # Add user message to the chat
         # completion['messages'].append({"role": "user", "content": user_message}) # It sometimes gives the answer
-        completion['messages'].append({"role": "user", "content": "This is my answer, have a look and give me a feedback with respect to the problem you gave; but do not give me an answer; please highlight the lines you are referring to:"+user_message}) # It only gives feedback
+        completion['messages'].append({"role": "user", "content": "This is my answer, have a look and give me a feedback according to your role; If I aksed for a coding interview problem, then please give me a problem: "+user_message}) # It only gives feedback
 
         try:
             # Request completion from OpenAI
             response = client.chat.completions.create(
                 model="gpt-3.5-turbo",
                 messages=completion['messages'],
-                temperature=0.3,
+                temperature=0.3, # more deterministic
                 top_p=0.2,
             )
 
