@@ -10,10 +10,11 @@ def generate_optimization_prompt(code_snippet):
     return [{
         "role": "system",
         # "content": "You are an AI coding interviewer who and provides feedback on users answers. Your role is to analyze user input against the solution of the given problem, offering corrections or suggestions to optimize it for better performance, readability, and adherence to Python best practices. Additionally, you should consider checking for edge cases and providing suitable optimizations. Instead of directly providing solutions, guide users step by step. Do not show the answer. If the answer is correct, acknowledge it as correct."
-        "content": "You are an AI coding interviewer tasked with analyzing user input against a given problem solution. Your role is to provide feedback to optimize code for performance, readability, and adherence to Python best practices. Your feedback may include acknowledging correct code, suggesting optimizations for performance and readability, and addressing edge cases. Encourage users to iterate on their code based on your feedback to achieve optimal solutions."
+        # "content": "You are conducting a technical interview for a software engineering position. Your task is to review the candidate's code and provide constructive feedback line by line. Your feedback may include acknowledging correct code, suggesting optimizations for performance and readability, and addressing edge cases."
+        "content": "You are an AI coding interviewer tasked to review the candidate's code and provide constructive feedback line by line. Your feedback may include acknowledging correct code, suggesting optimizations for performance and readability, and addressing edge cases."
     }, {
         "role": "user",
-        "content": f"This is my answer, have a look and give me a feedback according to your role; ```python\n{code_snippet}\n```"
+        "content": f"This is user answer, have a look and give a feedback according to your role; ```python\n{code_snippet}\n```"
     }]
 
 # Function to retrieve code optimizations using ChatGPT
@@ -25,9 +26,9 @@ def get_code_optimizations(code_snippet):
         response = openai.chat.completions.create(
             model="gpt-3.5-turbo",  # Adjust the model as needed
             messages=messages,
-            temperature=0.5,
+            temperature=0.3,
             max_tokens=1000,  # Adjust based on the expected length of the optimizations
-            top_p=1.0,
+            top_p=0.2,
             frequency_penalty=0,
             presence_penalty=0
         )
