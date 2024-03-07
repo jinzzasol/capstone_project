@@ -1,50 +1,38 @@
 import openai
-# from dotenv import load_dotenv
 
-# OpenAI API key setup
-openai.api_key = 'key here'
-# load_dotenv(dotenv_path='.env')
+openai.api_key = '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'
 
-# Function to generate the optimization prompt
 def generate_optimization_prompt(code_snippet):
     return [{
         "role": "system",
-        "content": "You are a helpful assistant. Analyze the following Python function for potential inefficiencies and provide suggestions to optimize it for better performance, readability, and adherence to Python best practices."
-    }, {
+        "content": "You are a helpful assistant. Analyze the following Python function for potential inefficiencies. Provide suggestions to optimize it for better performance, readability, and adherence to Python best practices as per PEP8. Structure your response with keywords: SUGGESTION for each optimization suggestion, REASON for explaining why it improves the code, and EXAMPLE for a code example."
+     }, {
         "role": "user",
         "content": f"```python\n{code_snippet}\n```"
     }]
 
-# Updated function to call the OpenAI API correctly
 def optimize_code_with_chatgpt(code_snippet):
     messages = generate_optimization_prompt(code_snippet)
     
-    # Call the OpenAI API with the correct method and parameters
     response = openai.chat.completions.create(
-        model="gpt-3.5-turbo",  # Adjust the model as needed
+        model="gpt-3.5-turbo", 
         messages=messages,
-        temperature=0.5,
-        max_tokens=1000,  # Adjust based on the expected length of the optimizations
-        top_p=1.0,
+        temperature=0.4,
+        max_tokens=1000, 
+        top_p=0.7,
         frequency_penalty=0,
         presence_penalty=0
     )
     
-    # Return the optimization suggestions
     return response.choices[0].message.content
     
 
-# Example user's code snippet
 user_code_snippet = """
-def find_duplicates(arr):
-    duplicates = []
-    for i in range(len(arr)):
-        for j in range(i + 1, len(arr)):
-            if arr[i] == arr[j] and arr[i] not in duplicates:
-                duplicates.append(arr[i])
-    return duplicates
+def isValid(s):
+    while '()' in s or '{}' in s or '[]' in s:
+        s = s.replace('()', '').replace('{}', '').replace('[]', '')
+    return s == ''
 """
 
-# Get optimization suggestions from ChatGPT
 optimization_suggestions = optimize_code_with_chatgpt(user_code_snippet)
 print("Optimization Suggestions:\n", optimization_suggestions)
