@@ -1,6 +1,6 @@
 import openai
 
-openai.api_key = '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'
+openai.api_key = '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'
 
 def generate_optimization_prompt(code_snippet):
     return [{
@@ -10,6 +10,29 @@ def generate_optimization_prompt(code_snippet):
         "role": "user",
         "content": f"```python\n{code_snippet}\n```"
     }]
+
+def optimize_code_with_feedback(code_snippet):
+    feedback = ""
+    iteration_count = 0
+    max_iterations = 3  # Limit the number of iterations to prevent infinite loops
+    
+    while iteration_count < max_iterations:
+        iteration_count += 1
+        print(f"\nOptimization Attempt #{iteration_count}\n{'-'*30}")
+        optimization_suggestions = optimize_code_with_chatgpt(code_snippet + feedback)
+        print("Optimization Suggestions:\n", optimization_suggestions)
+        
+        # Ask the user for feedback
+        user_input = input("Are you satisfied with the optimization suggestions? (yes/no/feedback): ")
+        if user_input.lower() == 'yes':
+            print("Optimization process completed.")
+            return
+        elif user_input.lower() == 'no':
+            feedback = "\nThe optimization suggestions were not satisfactory."
+        else:
+            feedback = f"\nUser feedback: {user_input}"
+    
+    print("Reached maximum optimization attempts.")
 
 def optimize_code_with_chatgpt(code_snippet):
     messages = generate_optimization_prompt(code_snippet)
@@ -34,5 +57,4 @@ def isValid(s):
     return s == ''
 """
 
-optimization_suggestions = optimize_code_with_chatgpt(user_code_snippet)
-print("Optimization Suggestions:\n", optimization_suggestions)
+optimize_code_with_feedback(user_code_snippet)
