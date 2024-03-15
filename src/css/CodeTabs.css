@@ -15,13 +15,13 @@
   }
   
   .code-tabs button.active {
-    border-bottom: 2px solid #61dafb; /* React blue for active tab indicator */
+    border-bottom: 2px solid #61dafb; 
   }
   
   .description-tab .symbol {
-    color:#61DBFB; /* Style for the symbols */
+    color:#61DBFB;
   }
   
   .description-tab .code-text {
-    color: white; /* Style for the 'Code' text */
+    color: white; 
   }
