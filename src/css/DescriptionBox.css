@@ -2,35 +2,51 @@
 .description-box {
   background-color: #1e1e1e; 
   color: white;
-  height: 850px;
+  padding-bottom: 20px; 
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column; 
+  justify-content: space-between; 
+  height: 850px; 
 }
 
 .description-tab {
   background-color: #333;
-  padding: 8px 16px; 
+  padding: 8px 16px;
   border-top-left-radius: 8px;
-  border-top-right-radius: 8px; 
+  border-top-right-radius: 8px;
   font-weight: bold;
 }
 
-
-.description-box h2 {
-  padding: 16px; 
-  margin: 0; 
-}
-
-.description-box p {
-  padding: 0 16px 16px; 
+.description-box h2, .description-box p {
+  padding: 16px;
   margin: 0; 
 }
 
 .description-navigation {
   display: flex;
   justify-content: space-between;
-  padding: 10px;
+  padding: 10px 16px; 
+  margin-top: auto; 
 }
 
 .description-navigation button {
-  padding: 5px 10px;
+  padding: 10px 20px; 
   cursor: pointer;
+  background-color: #3491aa; 
+  color: white; 
+  border: none;
+  border-radius: 4px;
+  font-size: 16px; 
+  font-weight: bold; 
+  outline: none; 
+}
+
+.description-navigation button:hover {
+  background-color: #010b14; 
+}
+
+.description-navigation button:disabled {
+  background-color: #555; 
+  cursor: not-allowed; 
 }
