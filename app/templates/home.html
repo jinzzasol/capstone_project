@@ -1,0 +1,33 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+	<h1 class="animated fadeIn"></h1>
+	<br>
+	<hr>
+		<div class="jumbotron animated fadeInUp">
+			<h3>Welcome to VT Carpooling</h3>
+			<br>
+			<p>Sharing is caring. A place for sharing your rides. Click <a href="/about">here</a> to learn more.</p>
+			<br><br>
+			{% if session.logged_in %}
+				<div class="text-center">
+					<a class="btn btn-lg btn-success" href="/shareRide">Share Ride</a>
+					&nbsp;&nbsp;&nbsp;&nbsp;
+					<a class="btn btn-lg btn-primary" href="/nearbyRides">Nearby Rides</a>
+				</div>
+			{% else %}
+				<form action="login" method="POST">
+					<div class="form-group">
+						<input type="text" name="username" placeholder="Contact No. or Email" class="form-control" value="{{ request.form.username }}" required>
+					</div>
+					<div class="form-group">
+						<input type="password" name="password" class="form-control" placeholder="Password" value="{{ request.form.password }}" required>
+					</div>
+					<p class="text-center">
+						<button type="submit" class="btn btn-primary">Login</button>
+					</p>
+				</form>
+			{% endif %}
+		</div>
+	<hr>
+{% endblock %}
