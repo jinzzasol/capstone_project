@@ -1,0 +1,96 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+    <h1 class="text-white animated fadeIn">About</h1>
+    <br>
+    <hr color="white">
+        <div class="jumbotron animated fadeInUp">
+            <br><br>
+            <p class="lead">
+                Hello Hokies! Welcome to VT Carpooling.
+                <br><br>
+                One stop solution to share rides at affordable prices
+                <br><br>
+                <h4>How it works?</h4>
+                People that are interested in sharing their vehicle can be found there. You can search for rides that are available in your city. Send them a request to join their ride if you discover one going to your location. They can get in touch with you and accept your request if they're also interested..
+                <br>
+                You can also share your Ride, on the other hand. You can share your ride and provide information about it, including its timing and destination. Requests for your ride will come from those who are interested. You may view every request. Make contact with the person you find appealing. Accept the requested action. and You two can travel together.
+                <br><br>
+                With VT Carpooling we're aiming to provide additional transportation options to VT students at affordable prices. It will also conserve resources and people can personally save money. We're excited to see how you make use of it.
+            </p>
+            <br><br>
+            <!DOCTYPE html>
+<html>
+<head>
+  <title>Search with Filters</title>
+  <!-- Include Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Search with Filters</h1>
+    <form id="search-form">
+      <div class="form-row">
+        <div class="col-md-4 mb-3">
+          <label for="filter">Filter</label>
+          <select class="form-control" id="filter">
+            <option value="id">ID</option>
+            <option value="name">Name</option>
+            <option value="creator">Creator</option>
+          </select>
+        </div>
+        <div class="col-md-6 mb-3">
+          <label for="search-term">Search Term</label>
+          <input type="text" class="form-control" id="search-term" placeholder="Enter search term">
+        </div>
+        <div class="col-md-2 mb-3">
+          <button class="btn btn-primary" type="submit">Search</button>
+        </div>
+      </div>
+    </form>
+    <div id="search-results"></div>
+  </div>
+
+  <!-- Include Bootstrap JS and jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+  <script>
+    $(document).ready(function() {
+      $('#search-form').submit(function(event) {
+        event.preventDefault(); // Prevent form submission
+
+        var filter = $('#filter').val();
+        var searchTerm = $('#search-term').val();
+
+        // Perform AJAX request to your Flask route with the filter and search term
+        $.ajax({
+          url: '/search',
+          type: 'POST',
+          data: {
+            filter: filter,
+            searchTerm: searchTerm
+          },
+          success: function(response) {
+            // Handle the response and display the search results
+            $('#search-results').html(response);
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>
+
+            {% if session.logged_in %}
+                <div class="text-center">
+                    <a class="btn btn-lg btn-success" href="/shareRide">Share Ride</a>
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+                    <a class="btn btn-lg btn-primary" href="/nearbyRides">Nearby Rides</a>
+                </div>
+            {% else %}
+            {% endif %}
+        </div>
+
+    <hr>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+	<h1 class="text-white animated fadeIn">Dashboard</h1>
+	<br>
+	<hr color="white">
+	<div class="jumbotron animated fadeInUp">
+		<h3>Welcome to VT Carpooling </h3>
+		<br>
+		<p>Sharing is caring. A place for sharing your rides. Click <a href="/about">here</a> to learn more.</p>
+		<br><br>
+		<div class="text-center">
+			<a class="btn btn-lg btn-success style="margin-left: 850px;" href="/shareRide">Share Ride</a>
+			&nbsp;&nbsp;&nbsp;&nbsp;
+			<a class="btn btn-lg btn-primary" href="/nearbyRides">Nearby Rides</a>
+		</div>
+	</div>
+
+	<hr>
+{% endblock %}
