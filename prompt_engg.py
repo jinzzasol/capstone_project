@@ -1,7 +1,8 @@
 import openai
 import ast
 
-openai.api_key = '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'
+openai.api_key = 'your key here'
+#'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''
 
 def generate_optimization_prompt(code_snippet):
     return [{
