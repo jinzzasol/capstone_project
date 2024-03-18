@@ -17,7 +17,6 @@ const CodeEditor = ({ language, code, setCode }) => {
 
   return (
     <>
-    
     <AceEditor className="ace-editor"
       mode={modes[language]}
       theme="monokai"
