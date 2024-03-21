@@ -2,7 +2,7 @@ import openai
 import ast
 
 
-openai.api_key = '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'
+openai.api_key = 'no key'
 current_code_context = ""
 last_indent_level = 0
 block_stack = []  
