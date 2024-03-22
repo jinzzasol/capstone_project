@@ -3,7 +3,7 @@ import axios from 'axios';
 
 export const sendCodeToBackend = async (code, questionId, submissionId) => {
   try {
-    const response = await axios.post('http://localhost:7070/submit-code', {
+    const response = await axios.post('http://localhost:7070/api/submit-code', {
       code: code,
       questionId: questionId,
       submissionId: submissionId,
