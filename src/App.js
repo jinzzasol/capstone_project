@@ -6,6 +6,7 @@ import DescriptionBox from './components/DescriptionBox';
 import CodeEditor from './components/CodeEditor';
 import CodeTabs from './components/CodeTabs';
 import questions from './data/questions';
+import SuggestionsTab from './components/SuggestionsTab'
 import { sendCodeToBackend } from './lib/codeHandler'
 
 function App() {
@@ -45,62 +46,82 @@ function App() {
     setCurrentQuestionIndex((prevIndex) => Math.min(prevIndex + 1, questions.length - 1));
   };
 
+  const [suggestions, setSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const sampleSuggestion = `Here's a suggestion to improve your code!`;
+
+
+
+
   const generateRandomSubmissionId = () => {
     const timestamp = Date.now(); 
     const randomPortion = Math.random().toString(36).substring(2, 15);
     return `submission-${timestamp}-${randomPortion}`;
   };
   
-    const handleSubmit = async () => {
-      const questionId = questions[currentQuestionIndex].id; 
-      const submissionId = generateRandomSubmissionId() 
-  
-      console.log("Submitting Code:", code, "Question ID:", questionId, "Submission ID:", submissionId);
-  
-      try {
-        const response = await sendCodeToBackend(code, questionId, submissionId);
+  const handleSubmit = async () => {
+    const questionId = questions[currentQuestionIndex].id;
+    const submissionId = generateRandomSubmissionId();
 
-        console.log("Backend Response:", response);
-      } catch (error) {
-  
-        console.error("Error from backend:", error);
-      }
-    };
+    console.log("Submitting Code:", code, "Question ID:", questionId, "Submission ID:", submissionId);
 
-  
+    try {
+      // const response = await sendCodeToBackend(code, questionId, submissionId);
+      // console.log("Backend Response:", response);
+
+      const suggestionsResponse = { data: [sampleSuggestion] }; //dummy
+
+      // FETCHING RESPONSE FROM BACKEND
+      // const suggestionsResponse = await axios.get(`/api/suggestions/${submissionId}`);
+      setSuggestions(suggestionsResponse.data);
+      setShowSuggestions(true); // Show the suggestions modal
+    } catch (error) {
+      console.error("Error from backend:", error);
+      setSuggestions([sampleSuggestion]); // Reset suggestions in case of an error
+      setShowSuggestions(false); // Ensure the modal is not shown
+    }
+  };
+
+  const handleCloseSuggestions = () => {
+    setShowSuggestions(false); // Hide the suggestions modal
+  };
+
   
   return (
     <div className="App">
-      <HeaderApp /> 
+      <HeaderApp />
       <div className="content">
         <div className="left-container">
-        <DescriptionBox 
-        title={questionDetails.title} 
-        description={questionDetails.description}
-        onPreviousClick={handlePreviousClick}
-        onNextClick={handleNextClick}
-        isFirst={currentQuestionIndex === 0}
-        isLast={currentQuestionIndex === questions.length - 1}
-        />
+          <DescriptionBox
+            title={questionDetails.title}
+            description={questionDetails.description}
+            onPreviousClick={handlePreviousClick}
+            onNextClick={handleNextClick}
+            isFirst={currentQuestionIndex === 0}
+            isLast={currentQuestionIndex === questions.length - 1}
+          />
         </div>
-        <div className="right-container"> 
-      <CodeTabs activeLanguage={activeLanguage} setActiveLanguage={setActiveLanguage} />
-      <CodeEditor language={activeLanguage} code={code} setCode={setCode} />
-      <button 
-            className="submit-button" 
-            onClick={handleSubmit}
-            style = {{ position: 'absolute',
-              right: '20px',
-              bottom: '20px',
-              padding: '10px 20px',
-  }}
-          >
-            Submit
-          </button>
+        <div className="right-container">
+          <CodeTabs activeLanguage={activeLanguage} setActiveLanguage={setActiveLanguage} />
+          <div className="upper-container">
+            <CodeEditor language={activeLanguage} code={code} setCode={setCode} />
+          </div> 
+  {/* SuggestionsTab now placed here, as part of the right-container */}
+  {showSuggestions && (
+    <div className="lower-container">
+      <SuggestionsTab suggestions={suggestions} onClose={handleCloseSuggestions} />
     </div>
+  )}
+  <button 
+    className="submit-button" 
+    onClick={handleSubmit}
+    style={{ position: 'absolute', right: '20px', bottom: '20px', padding: '10px 20px' }}
+  >
+    Submit
+  </button>
         </div>
       </div>
+    </div>
   );
 }
-
 export default App;
