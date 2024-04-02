@@ -1,24 +1,35 @@
 .suggestions-container {
   padding: 10px;
-  background-color: #f5f5f5; /* Light grey background for visibility */
-  border-top: 2px solid #ccc; /* Visual separation from the code editor */
-  overflow-y: auto; /* Allow scrolling within suggestions */
+  background-color: #f5f5f5; 
+  border-top: 2px solid #ccc; 
+  overflow-y: auto; 
 }
 
 .close-btn {
   display: block;
   padding: 5px 10px;
-  margin-bottom: 10px; /* Spacing between button and suggestions */
-  background-color: #db4437; /* Red button for visibility */
-  color: white;
+  margin-bottom: 10px;
+  background-color: #db4437;
   border: none;
   cursor: pointer;
 }
 
-.suggestions-content {
-  /* Styling for the content area */
+.suggestion-item {
+  margin-bottom: 10px; 
 }
 
-.suggestion-item {
-  margin-bottom: 10px; /* Spacing between suggestions */
+
+.feedback-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  padding-top: 10px;
+}
+
+.feedback-buttons button {
+  cursor: pointer;
+  background-color: #f0f0f0;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 5px 10px;
 }
