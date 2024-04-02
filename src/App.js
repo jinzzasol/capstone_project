@@ -48,8 +48,10 @@ function App() {
 
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const sampleSuggestion = `Here's a suggestion to improve your code!`;
-
+  const sampleSuggestion = [
+    { id: 1, text: "Here's a suggestion to improve your code!", feedback: null },
+  ];
+  
 
 
 
@@ -69,21 +71,21 @@ function App() {
       // const response = await sendCodeToBackend(code, questionId, submissionId);
       // console.log("Backend Response:", response);
 
-      const suggestionsResponse = { data: [sampleSuggestion] }; //dummy
-
+   
       // FETCHING RESPONSE FROM BACKEND
       // const suggestionsResponse = await axios.get(`/api/suggestions/${submissionId}`);
-      setSuggestions(suggestionsResponse.data);
-      setShowSuggestions(true); // Show the suggestions modal
+
+      setSuggestions(sampleSuggestion); // replace with suggestionsResponse once backend ready
+      setShowSuggestions(true);
     } catch (error) {
       console.error("Error from backend:", error);
-      setSuggestions([sampleSuggestion]); // Reset suggestions in case of an error
-      setShowSuggestions(false); // Ensure the modal is not shown
+      setSuggestions([sampleSuggestion]);
+      setShowSuggestions(false); 
     }
   };
 
   const handleCloseSuggestions = () => {
-    setShowSuggestions(false); // Hide the suggestions modal
+    setShowSuggestions(false); 
   };
 
   
@@ -106,7 +108,6 @@ function App() {
           <div className="upper-container">
             <CodeEditor language={activeLanguage} code={code} setCode={setCode} />
           </div> 
-  {/* SuggestionsTab now placed here, as part of the right-container */}
   {showSuggestions && (
     <div className="lower-container">
       <SuggestionsTab suggestions={suggestions} onClose={handleCloseSuggestions} />
