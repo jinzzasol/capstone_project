@@ -1,3 +1,4 @@
+/* app.css */
 .App {
   text-align: left;
   margin: 0;
@@ -22,6 +23,15 @@
   width: 50%;
 }
 
+.upper-container {
+  flex: 1; /* This will allow it to fill the space */
+  overflow: auto; /* In case content overflows */
+}
+
+.lower-container {
+  flex: 1; /* Adjust this value based on how much space you want the suggestions to take */
+  overflow: auto; /* In case content overflows */
+}
 
 .App-logo {
   height: 40vmin;
