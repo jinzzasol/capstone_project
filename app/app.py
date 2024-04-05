@@ -33,7 +33,7 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = "747b60ab7ef6e02cf56da6503adae95198fa6dad"
 CORS(app)
 
-openai.api_key = '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'
+openai.api_key = ''
 current_code_context = ""
 last_indent_level = 0
 block_stack = []  
