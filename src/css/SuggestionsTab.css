@@ -1,8 +1,46 @@
+/* SuggestionsTab.css adjustments */
 .suggestions-container {
-  padding: 10px;
-  background-color: #f5f5f5; 
-  border-top: 2px solid #ccc; 
-  overflow-y: auto; 
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 50vh; /* Take half of the viewport height */
+  background-color: #f5f5f5;
+  border-top: 2px solid #ccc;
+  overflow-y: auto;
+  transition: bottom 0.3s ease-in-out; /* Smooth transition */
+  z-index: 5;
+  background-color: black;
+  color: yellow;
+}
+
+/* To hide the suggestions tab, you can toggle a class that sets bottom to -50vh */
+.suggestions-container.hide {
+  bottom: -50vh;
+}
+
+@media (max-width: 600px) {
+  .suggestions-container {
+    height: 75vh; /* Take more space on smaller screens */
+  }
+}
+
+/* Example using flexbox for the main layout */
+.main-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh; /* Full viewport height */
+}
+
+.code-editor-container, .description-box-container {
+  flex: 1; /* Each takes up equal space */
+  overflow: auto; /* Add scroll if content overflows */
+}
+
+@media (min-width: 600px) {
+  .main-container {
+    flex-direction: row; /* Side by side on larger screens */
+  }
 }
 
 .close-btn {
