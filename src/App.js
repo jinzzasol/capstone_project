@@ -17,6 +17,11 @@ function App() {
 
   // Adding state to hold question details fetched from the API
   const [questionDetails, setQuestionDetails] = useState({ title: '', description: '' });
+  const [isSuggestionsVisible, setSuggestionsVisible] = useState(false);
+    
+  // Toggle visibility based on your application logic
+  const toggleSuggestions = () => setSuggestionsVisible(!isSuggestionsVisible);
+
 
   // Function to fetch question details
   const fetchQuestionDetails = async () => {
@@ -64,23 +69,33 @@ function App() {
   const handleSubmit = async () => {
     const questionId = questions[currentQuestionIndex].id;
     const submissionId = generateRandomSubmissionId();
+    const submissionUrl = 'http://localhost:7070/api/submit-code'; // Your Flask backend endpoint for code submission
 
     console.log("Submitting Code:", code, "Question ID:", questionId, "Submission ID:", submissionId);
 
     try {
-      // const response = await sendCodeToBackend(code, questionId, submissionId);
-      // console.log("Backend Response:", response);
+      // Prepare the submission data
+      const submissionData = {
+        code: code,
+        questionId: questionId,
+        submissionId: submissionId
+      };
 
-   
-      // FETCHING RESPONSE FROM BACKEND
-      // const suggestionsResponse = await axios.get(`/api/suggestions/${submissionId}`);
+      // Send the submission data to the backend
+      const response = await axios.post(submissionUrl, submissionData);
+      console.log("Backend Response:", response.data);
 
-      setSuggestions(sampleSuggestion); // replace with suggestionsResponse once backend ready
+      // Assume the backend response contains suggestions in `response.data.suggestions`
+      setSuggestions(response.data.suggestions); // Use actual suggestions from the backend
       setShowSuggestions(true);
     } catch (error) {
       console.error("Error from backend:", error);
-      setSuggestions([sampleSuggestion]);
-      setShowSuggestions(false); 
+      setSuggestions([{
+        id: 0,
+        text: "There was an error processing your request. Please try again later.",
+        feedback: null
+      }]);
+      setShowSuggestions(true); // Optionally, you might want to still show the suggestions box with the error message
     }
   };
 
@@ -93,7 +108,7 @@ function App() {
     <div className="App">
       <HeaderApp />
       <div className="content">
-        <div className="left-container">
+      <div className="description-box-container" style={{flex: isSuggestionsVisible ? '0.5' : '1'}}>
           <DescriptionBox
             title={questionDetails.title}
             description={questionDetails.description}
@@ -105,9 +120,11 @@ function App() {
         </div>
         <div className="right-container">
           <CodeTabs activeLanguage={activeLanguage} setActiveLanguage={setActiveLanguage} />
-          <div className="upper-container">
+          <div className="main-container">
+            <div className="code-editor-container" style={{flex: isSuggestionsVisible ? '0.5' : '1'}}>
             <CodeEditor language={activeLanguage} code={code} setCode={setCode} />
           </div> 
+          </div>
   {showSuggestions && (
     <div className="lower-container">
       <SuggestionsTab suggestions={suggestions} onClose={handleCloseSuggestions} />
@@ -116,7 +133,7 @@ function App() {
   <button 
     className="submit-button" 
     onClick={handleSubmit}
-    style={{ position: 'absolute', right: '20px', bottom: '20px', padding: '10px 20px' }}
+    style={{ position: 'absolute', right: '20px', bottom: '175px', padding: '10px 20px' }}
   >
     Submit
   </button>
