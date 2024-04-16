@@ -10,8 +10,8 @@
   overflow-y: auto;
   transition: bottom 0.3s ease-in-out; /* Smooth transition */
   z-index: 5;
-  background-color: black;
-  color: yellow;
+  background-color: gray;
+  color: white;
 }
 
 /* To hide the suggestions tab, you can toggle a class that sets bottom to -50vh */
