@@ -86,6 +86,10 @@ function App() {
       console.log("Backend Response:", response.data);
 
       // Assume the backend response contains suggestions in `response.data.suggestions`
+      const formattedSuggestions = response.data.suggestions.map(s => ({
+        line: s.line, // ensure this matches your backend response structure
+        description: s.description
+      }));
       setSuggestions(response.data.suggestions); // Use actual suggestions from the backend
       setShowSuggestions(true);
     } catch (error) {
@@ -122,7 +126,12 @@ function App() {
           <CodeTabs activeLanguage={activeLanguage} setActiveLanguage={setActiveLanguage} />
           <div className="main-container">
             <div className="code-editor-container" style={{flex: isSuggestionsVisible ? '0.5' : '1'}}>
-            <CodeEditor language={activeLanguage} code={code} setCode={setCode} />
+            <CodeEditor
+  language={activeLanguage}
+  code={code}
+  setCode={setCode}
+  suggestions={suggestions}
+/>
           </div> 
           </div>
   {showSuggestions && (
