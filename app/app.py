@@ -30,9 +30,10 @@ from forms import RegisterForm
 from database_credentials import credentials
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = ""
+app.config['SECRET_KEY'] = "747b60ab7ef6e02cf56da6503adae95198fa6dad"
 CORS(app)
 
+openai.api_key = ""
 current_code_context = ""
 last_indent_level = 0
 block_stack = []  
