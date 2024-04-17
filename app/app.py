@@ -30,10 +30,10 @@ from forms import RegisterForm
 from database_credentials import credentials
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = "747b60ab7ef6e02cf56da6503adae95198fa6dad"
+app.config['SECRET_KEY'] = ""
 CORS(app)
 
-openai.api_key = 'sk-proj-InhYk5hn837mPpMbEtg5T3BlbkFJIgagaRkvJq4Cv7ucugm6'
+openai.api_key = ""
 @app.before_request
 def before_request():
     # Initialize the variables for each request
