@@ -22,6 +22,15 @@ function App() {
   // Toggle visibility based on your application logic
   const toggleSuggestions = () => setSuggestionsVisible(!isSuggestionsVisible);
 
+  const sendLineToBackend = async (line) => {
+    try {
+      await axios.post('http://localhost:7070/api/submit-line', { line });
+      console.log("new line created")
+    } catch (error) {
+      console.error('Error sending line to backend:', error);
+    }
+  };
+
 
   // Function to fetch question details
   const fetchQuestionDetails = async () => {
@@ -108,7 +117,7 @@ function App() {
     <div className="App">
       <HeaderApp />
       <div className="content">
-      <div className="description-box-container" style={{flex: isSuggestionsVisible ? '0.5' : '1'}}>
+        <div className="description-box-container" style={{flex: isSuggestionsVisible ? '0.5' : '1'}}>
           <DescriptionBox
             title={questionDetails.title}
             description={questionDetails.description}
@@ -122,21 +131,26 @@ function App() {
           <CodeTabs activeLanguage={activeLanguage} setActiveLanguage={setActiveLanguage} />
           <div className="main-container">
             <div className="code-editor-container" style={{flex: isSuggestionsVisible ? '0.5' : '1'}}>
-            <CodeEditor language={activeLanguage} code={code} setCode={setCode} />
-          </div> 
+              <CodeEditor 
+                language={activeLanguage} 
+                code={code} 
+                setCode={setCode} 
+                onNewLineAdded={sendLineToBackend}
+              />
+            </div>
           </div>
-  {showSuggestions && (
-    <div className="lower-container">
-      <SuggestionsTab suggestions={suggestions} onClose={handleCloseSuggestions} />
-    </div>
-  )}
-  <button 
-    className="submit-button" 
-    onClick={handleSubmit}
-    style={{ position: 'absolute', right: '20px', bottom: '175px', padding: '10px 20px' }}
-  >
-    Submit
-  </button>
+          {showSuggestions && (
+            <div className="lower-container">
+              <SuggestionsTab suggestions={suggestions} onClose={handleCloseSuggestions} />
+            </div>
+          )}
+          <button 
+            className="submit-button" 
+            onClick={handleSubmit}
+            style={{ position: 'absolute', right: '20px', bottom: '175px', padding: '10px 20px' }}
+          >
+            Submit
+          </button>
         </div>
       </div>
     </div>

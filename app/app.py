@@ -9,7 +9,7 @@ from flask import logging
 from flask import jsonify
 from passlib.hash import sha256_crypt
 from flask_cors import CORS
-
+from flask import g
 import openai
 import ast
 
@@ -33,10 +33,16 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = "747b60ab7ef6e02cf56da6503adae95198fa6dad"
 CORS(app)
 
-openai.api_key = ""
-current_code_context = ""
-last_indent_level = 0
-block_stack = []  
+openai.api_key = 'sk-proj-InhYk5hn837mPpMbEtg5T3BlbkFJIgagaRkvJq4Cv7ucugm6'
+@app.before_request
+def before_request():
+    # Initialize the variables for each request
+    if 'current_code_context' not in g:
+        g.current_code_context = ""
+    if 'last_indent_level' not in g:
+        g.last_indent_level = 0
+    if 'block_stack' not in g:
+        g.block_stack = []
 
 # conn = pg2.connect(
 # 	database = credentials['database'],
@@ -248,7 +254,7 @@ def handle_submit():
     question = next((q for q in questions if q["id"] == questionId), None)
     if question is not None:
             description = question["description"]
-            msg=optimize_code_with_chatgpt(description + code)
+            msg=parse_code_real_time(code)
             app.logger.info(msg)
 
     # Process the code here, for example, analyze it and generate suggestions
@@ -283,6 +289,22 @@ def dashboard():
 # def index():
 #     return render_template('index.html')
 
+@app.route('/api/submit-line', methods=['POST'])
+def handle_submit_line():
+    line = request.json['line']
+    app.logger.info("the line is" +line)
+    print("Received line:", line)
+    if line is not None:
+        msg=add_line_of_code(line)
+        app.logger.info(msg)
+
+    # Process the code here, for example, analyze it and generate suggestions
+    suggestions = [{'id': 1, 'text': "", 'feedback': "Consider using a list comprehension."}]
+
+    # Return the suggestions as part of the response
+    return jsonify({"message": "Submission received successfully"})
+
+
 @app.route('/ask', methods=['POST'])
 def ask():
     data = request.json
@@ -307,8 +329,10 @@ def ask():
 
 
 def add_line_of_code(new_line):
-    global current_code_context
-    current_code_context += f"\n{new_line}"
+    g.current_code_context
+    app.logger.info("the addline of code" + g.current_code_context)
+    g.current_code_context += f"\n{new_line}"
+    app.logger.info("the addline of code after adding new line" + g.current_code_context)
     parse_code_real_time(new_line)
 
 
@@ -452,14 +476,13 @@ def on_code_segment_completed(code_segment):
 
 
 def parse_code_real_time(new_line):
-    global last_indent_level
-    global current_code_context
-
+    g.last_indent_level
+    g.current_code_context
     current_indent_level = len(new_line) - len(new_line.lstrip())
     block_ending_keywords = ['return', 'break', 'continue', 'pass', 'raise']
-    if (any(keyword in new_line for keyword in block_ending_keywords) or current_indent_level < last_indent_level) and current_code_context.strip() != "":
+    if (any(keyword in new_line for keyword in block_ending_keywords) or current_indent_level < g.last_indent_level) and g.current_code_context.strip() != "":
         try:
-            wrapped_code = wrap_code_block(current_code_context)
+            wrapped_code = wrap_code_block(g.current_code_context)
             tree = ast.parse(wrapped_code)
             for node in ast.walk(tree):
                 if isinstance(node, ast.FunctionDef):
@@ -471,9 +494,9 @@ def parse_code_real_time(new_line):
         except SyntaxError as e:
             print(f"Syntax Error: {e}")
         finally:
-            last_indent_level = 0
+            g.last_indent_level = 0
     else:         
-        last_indent_level = current_indent_level
+        g.last_indent_level = current_indent_level
 
 
 if __name__ == '__main__':
