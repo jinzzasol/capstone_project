@@ -5,3 +5,44 @@
     height: 680px !important;
 
 }
+.highlighted-line {
+    position: absolute;
+    background-color: #fffa5f; /* Bright color for high visibility */
+    opacity: 0.5; /* Slightly see-through so text is readable */
+  }
+  .tooltip {
+    position: fixed; /* Changed from absolute to fixed to position relative to the viewport */
+    z-index: 1000;
+    padding: 8px 12px;
+    background-color: #8d4e4e;
+    color: white;
+    border-radius: 4px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    font-size: 14px;
+    pointer-events: none; /* Ensures the tooltip doesn't interfere with other interactions */
+    transform: translate(-50%, -100%); /* Centers the tooltip above the cursor and adjusts it to not overlap the cursor */
+  }
+  
+  /* Optional: animations for the tooltip to gently fade in or scale up */
+  .tooltip-enter {
+    opacity: 0;
+    transform: scale(0.96);
+    transition: opacity 0.3s, transform 0.3s;
+  }
+  
+  .tooltip-enter-active {
+    opacity: 1;
+    transform: scale(1);
+  }
+  .tooltip-close-button {
+    float: right;
+    border: none;
+    background: none;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  
+  .tooltip-close-button:hover {
+    color: #ccc;
+  }
