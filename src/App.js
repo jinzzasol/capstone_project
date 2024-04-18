@@ -1,3 +1,5 @@
+/*App.js*/
+
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './App.css';
@@ -21,16 +23,27 @@ function App() {
     
   // Toggle visibility based on your application logic
   const toggleSuggestions = () => setSuggestionsVisible(!isSuggestionsVisible);
-
-  const sendLineToBackend = async (line) => {
+  const [highlightedLine, setHighlightedLine] = useState(null);
+  const [tooltipText, setTooltipText] = useState('');
+  const [tooltipVisible, setTooltipVisible] = useState(false);
+  
+  const sendLineToBackend = async (line, lineNumber) => {
     try {
-      await axios.post('http://localhost:7070/api/submit-line', { line });
-      console.log("new line created")
+      const response = await axios.post('http://localhost:7070/api/submit-line', { line });
+      console.log("Line submitted, response:", response.data);
+  
+      // Set the response to show in a tooltip
+      setTooltipText(response.data.message); // Assuming the message is in response.data.message
+      setTooltipVisible(true);
+      setHighlightedLine(lineNumber); // Store the line number that should be highlighted
+  
     } catch (error) {
       console.error('Error sending line to backend:', error);
+      setTooltipText("Error submitting line.");
+      setTooltipVisible(true);
     }
   };
-
+  
 
   // Function to fetch question details
   const fetchQuestionDetails = async () => {
@@ -131,12 +144,16 @@ function App() {
           <CodeTabs activeLanguage={activeLanguage} setActiveLanguage={setActiveLanguage} />
           <div className="main-container">
             <div className="code-editor-container" style={{flex: isSuggestionsVisible ? '0.5' : '1'}}>
-              <CodeEditor 
-                language={activeLanguage} 
-                code={code} 
-                setCode={setCode} 
-                onNewLineAdded={sendLineToBackend}
-              />
+            <CodeEditor
+              language={activeLanguage}
+              code={code}
+              setCode={setCode}
+              highlightedLine={highlightedLine}
+              tooltipText={tooltipText}
+              tooltipVisible={tooltipVisible}
+              setTooltipVisible={setTooltipVisible}
+              onNewLineAdded={sendLineToBackend}
+            />
             </div>
           </div>
           {showSuggestions && (
