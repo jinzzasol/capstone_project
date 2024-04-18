@@ -1,4 +1,4 @@
-/* Code Editor.css */
+/* Code Editor.js */
 import React, { useEffect, useRef, useState } from 'react';
 import AceEditor from 'react-ace';
 import '../css/CodeEditor.css'
@@ -61,18 +61,26 @@ const CodeEditor = ({
   useEffect(() => {
     if (tooltipVisible && editorRef.current) {
       const editor = editorRef.current.editor;
+  
       const handleCursorChange = () => {
-        const { row, column } = editor.getCursorPosition();
-        const screenPos = editor.renderer.textToScreenCoordinates(row, column);
-        setTooltipPosition({ left: screenPos.pageX + 10, top: screenPos.pageY + 10 });
+        const cursorPosition = editor.getCursorPosition();
+        const screenPosition = editor.renderer.textToScreenCoordinates(cursorPosition.row, cursorPosition.column);
+        // Adjust to set the tooltip right under the cursor using the scroller's position
+        setTooltipPosition({
+          left: screenPosition.pageX - editor.renderer.scroller.getBoundingClientRect().left + editor.renderer.scrollLeft,
+          top: screenPosition.pageY - editor.renderer.scroller.getBoundingClientRect().top + editor.renderer.scrollTop + 20, // Adjust the '20' if needed to position below the cursor line
+        });
       };
-
+      
       editor.on('changeCursor', handleCursorChange);
+  
+      // Clean up event listener
       return () => {
         editor.off('changeCursor', handleCursorChange);
       };
     }
-  }, [tooltipVisible]);
+  }, [tooltipVisible, editorRef]);
+  
 
   return (
     <>
@@ -92,7 +100,7 @@ const CodeEditor = ({
         }}
       />
       {tooltipVisible && (
-        <div className="tooltip" style={{ position: 'absolute', left: tooltipPosition.left, top: tooltipPosition.top }}>
+        <div className="tooltip" style={{  position: 'absolute', left: tooltipPosition.left, top: tooltipPosition.top }}>
           {tooltipText}
           <button className="tooltip-close-button" onClick={handleCloseTooltip}>&times;</button>
         </div>

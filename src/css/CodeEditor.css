@@ -11,18 +11,27 @@
     opacity: 0.5; /* Slightly see-through so text is readable */
   }
   .tooltip {
-    position: fixed; /* Changed from absolute to fixed to position relative to the viewport */
-    z-index: 1000;
+    position: fixed;  
+    z-index: 1050;   
     padding: 8px 12px;
-    background-color: #8d4e4e;
+    background-color: #81ab7d;
     color: white;
     border-radius: 4px;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    font-size: 14px;
-    pointer-events: none; /* Ensures the tooltip doesn't interfere with other interactions */
-    transform: translate(-50%, -100%); /* Centers the tooltip above the cursor and adjusts it to not overlap the cursor */
-  }
-  
+    box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+    pointer-events: auto; 
+}
+
+.tooltip-close-button {
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 16px;
+    position: absolute;
+    top: 2px;
+    right: 5px;
+}
+
   /* Optional: animations for the tooltip to gently fade in or scale up */
   .tooltip-enter {
     opacity: 0;
@@ -33,16 +42,4 @@
   .tooltip-enter-active {
     opacity: 1;
     transform: scale(1);
-  }
-  .tooltip-close-button {
-    float: right;
-    border: none;
-    background: none;
-    color: white;
-    font-size: 16px;
-    cursor: pointer;
-  }
-  
-  .tooltip-close-button:hover {
-    color: #ccc;
   }

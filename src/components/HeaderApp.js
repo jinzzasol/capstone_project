@@ -1,7 +1,7 @@
 /*HeaderApp.js*/
 import React from 'react';
 import '../css/HeaderApp.css'; 
-import logo from '../assets/logo192.png';
+import logo from '../assets/logo.png';
 const HeaderApp = () => {
   return (
     <header className="header-app">
