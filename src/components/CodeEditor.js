@@ -8,6 +8,7 @@ import 'ace-builds/src-noconflict/mode-python';
 import 'ace-builds/src-noconflict/mode-c_cpp';
 import 'ace-builds/src-noconflict/mode-java';
 import 'ace-builds/src-noconflict/theme-monokai'; 
+import ace from 'ace-builds';
 
 const CodeEditor = ({
   language,
@@ -42,44 +43,54 @@ const CodeEditor = ({
       onNewLineAdded(currentLine, lines.length - 2);
     }
   };
+  const markerIdRef = useRef(null);
 
-  // Effect for highlighting lines
   useEffect(() => {
     const editor = editorRef.current && editorRef.current.editor;
     const session = editor && editor.getSession();
-    
-    if (editor && highlightedLine !== null) {
-      // Clear existing markers
-      session.clearMarkers();
+    const Range = ace.require('ace/range').Range;
+  
+    // Initialize a ref to store the current marker ID
 
-      // Highlight new line
-      session.addMarker(new Range(highlightedLine, 0, highlightedLine, 1), "highlighted-line", "fullLine");
+  
+    if (session && highlightedLine !== null) {
+      // Remove the existing marker if it exists
+      if (markerIdRef.current !== null) {
+        session.removeMarker(markerIdRef.current);
+      }
+  
+      // Highlight the new line and update the marker ID
+      markerIdRef.current = session.addMarker(new Range(highlightedLine, 0, highlightedLine, 1), "highlighted-line", "fullLine");
     }
   }, [highlightedLine]);
-
   // Effect for showing tooltips
   useEffect(() => {
     if (tooltipVisible && editorRef.current) {
       const editor = editorRef.current.editor;
+      const session = editor.getSession();
   
       const handleCursorChange = () => {
-        const cursorPosition = editor.getCursorPosition();
-        const screenPosition = editor.renderer.textToScreenCoordinates(cursorPosition.row, cursorPosition.column);
-        // Adjust to set the tooltip right under the cursor using the scroller's position
-        setTooltipPosition({
-          left: screenPosition.pageX - editor.renderer.scroller.getBoundingClientRect().left + editor.renderer.scrollLeft,
-          top: screenPosition.pageY - editor.renderer.scroller.getBoundingClientRect().top + editor.renderer.scrollTop + 20, // Adjust the '20' if needed to position below the cursor line
-        });
+        if (highlightedLine !== null) {
+          const screenPosition = editor.renderer.textToScreenCoordinates(highlightedLine, 0); // Get coordinates for the start of the highlighted line
+          // Adjust to set the tooltip right beside the highlighted line using the scroller's position
+          setTooltipPosition({
+            left: screenPosition.pageX - editor.renderer.scroller.getBoundingClientRect().left + editor.renderer.scrollLeft + 10, // Adjust the '10' if needed to position beside the line
+            top: screenPosition.pageY - editor.renderer.scroller.getBoundingClientRect().top + editor.renderer.scrollTop,
+          });
+        }
       };
-      
+  
+      // Add event listener for cursor change
       editor.on('changeCursor', handleCursorChange);
+      // Trigger once initially in case the cursor doesn't move
+      handleCursorChange();
   
       // Clean up event listener
       return () => {
         editor.off('changeCursor', handleCursorChange);
       };
     }
-  }, [tooltipVisible, editorRef]);
+  }, [tooltipVisible, highlightedLine, editorRef]);
   
 
   return (
