@@ -302,7 +302,7 @@ def handle_submit_line():
     suggestions = [{'id': 1, 'text': "", 'feedback': "Consider using a list comprehension."}]
 
     # Return the suggestions as part of the response
-    return jsonify({"message": "Submission received successfully"})
+    return jsonify({"message": "line processed successfully"})
 
 
 @app.route('/ask', methods=['POST'])
