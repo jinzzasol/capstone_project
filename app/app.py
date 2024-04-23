@@ -12,6 +12,8 @@ from flask_cors import CORS
 from flask import g
 import openai
 import ast
+from flask_session import Session
+from cachelib.file import FileSystemCache
 
 import psycopg2 as pg2
 
@@ -30,20 +32,50 @@ from forms import RegisterForm
 from database_credentials import credentials
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = ""
-CORS(app)
+app.config['SECRET_KEY'] = '747b60ab7ef6e02cf56da6503adae95198fa6dad'
+app.config["OIDC_CLIENT_SECRETS"] = "client_secrets.json"
+app.secret_key = '747b60ab7ef6e02cf56da6503adae95198fa6dad'
+app.config['SESSION_TYPE'] = 'filesystem'
+app.config["OIDC_COOKIE_SECURE"] = False
+app.config["OIDC_CALLBACK_ROUTE"] = "/callback"
+app.config["OIDC_SCOPES"] = ["openid", "email", "profile"]
+app.config['SESSION_COOKIE_SAMESITE'] = 'None'
+app.config['SESSION_COOKIE_SECURE'] = True
+
+SESSION_TYPE = 'cachelib'
+SESSION_SERIALIZATION_FORMAT = 'json'
+SESSION_CACHELIB = FileSystemCache(threshold=500, cache_dir="/sessions"),
 
 openai.api_key = ""
-@app.before_request
-def before_request():
-    # Initialize the variables for each request
-    if 'current_code_context' not in g:
-        g.current_code_context = ""
-    if 'last_indent_level' not in g:
-        g.last_indent_level = 0
-    if 'block_stack' not in g:
-        g.block_stack = []
+CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}}, supports_credentials=True)
+Session(app)
 
+
+# oauth = OAuth(app)
+# google = oauth.register(
+#     name='google',
+#     client_id='YOUR_CLIENT_ID',
+#     client_secret='YOUR_CLIENT_SECRET',
+#     access_token_url='https://accounts.google.com/o/oauth2/token',
+#     access_token_params=None,
+#     authorize_url='https://accounts.google.com/o/oauth2/auth',
+#     authorize_params=None,
+#     api_base_url='https://www.googleapis.com/oauth2/v1/',
+#     userinfo_endpoint='https://openidconnect.googleapis.com/v1/userinfo',
+#     client_kwargs={'scope': 'openid email profile'},
+# )
+
+openai.api_key = ""
+# @app.before_request
+# def before_request():
+#     # Initialize the variables for each request
+#     # app.logger.debug('Request path',session['current_code_context'])
+#     # app.logger.debug('Session ID: %s', session.sid if 'sid' in session else 'No session ID')
+
+@app.after_request
+def after_request(response):
+    app.logger.debug(f"After Request - Session Data: {dict(session)}")
+    return response
 # conn = pg2.connect(
 # 	database = credentials['database'],
 # 	user = credentials['user'],
@@ -64,32 +96,34 @@ start_time = time.time()
 last_exception = None
 conn = None
 
-while (startup_duration < timeout_s):
-	try:
-		startup_duration = time.time() - start_time
-		conn = pg2.connect(
-			database = os.environ.get('POSTGRES_DB'),
-			user = os.environ.get('POSTGRES_USER'),
-			password = os.environ.get('POSTGRES_PASSWORD'),
-			host = os.environ.get('POSTGRES_HOST'),
-			port = os.environ.get('POSTGRES_PORT')
-		)
-		break
-	except Exception as e:
-		print(f'Elapsed: {int(startup_duration)} / {timeout_s} seconds')
-		last_exception = e
-		time.sleep(1)
-if conn is None:
-	print(f'Could not connect to the database within {timeout_s} seconds - {last_exception}')
-	exit()
+# while (startup_duration < timeout_s):
+# 	try:
+# 		startup_duration = time.time() - start_time
+# 		conn = pg2.connect(
+# 			database = os.environ.get('POSTGRES_DB'),
+# 			user = os.environ.get('POSTGRES_USER'),
+# 			password = os.environ.get('POSTGRES_PASSWORD'),
+# 			host = os.environ.get('POSTGRES_HOST'),
+# 			port = os.environ.get('POSTGRES_PORT')
+# 		)
+# 		break
+# 	except Exception as e:
+# 		print(f'Elapsed: {int(startup_duration)} / {timeout_s} seconds')
+# 		last_exception = e
+# 		time.sleep(1)
+# if conn is None:
+# 	print(f'Could not connect to the database within {timeout_s} seconds - {last_exception}')
+# 	exit()
 
-connection_status = ('Not connected', 'Connected')[conn.closed == 0]
-print(f'Connection status: {connection_status}\n\n', file=sys.stderr, flush=True)
+# connection_status = ('Not connected', 'Connected')[conn.closed == 0]
+# print(f'Connection status: {connection_status}\n\n', file=sys.stderr, flush=True)
 
 # Index
 @app.route('/')
 def index():
-	return render_template('index.html')
+    session['example'] = 'Hello, world!'
+    app.logger.debug('In index %s', session['example'])
+    return render_template('index.html')
 
 # Terms
 @app.route('/about')
@@ -150,52 +184,67 @@ def register():
 
 	return render_template('register.html', form = form)
 
-# User login
-@app.route('/login', methods=['GET','POST'])
-@is_not_logged_in
+
+
+@app.route('/login')
 def login():
-	if request.method == 'POST':
-		# Get Form Fields
-		username = request.form['username']
-		password_candidate = request.form['password']
+    return google.authorize_redirect(redirect_uri=url_for('authorize', _external=True))
 
-		# Create cursor
-		cur = conn.cursor()
+@app.route('/login/callback')
+def authorize():
+    token = google.authorize_access_token()
+    resp = google.get('userinfo')
+    user_info = resp.json()
+    return f'Hello, {user_info["name"]}!'
 
-		try:
-			# Get user by either Email or ContactNo
-			if '@' in username:
-				cur.execute("SELECT userId, password, userStatus, userType, fname, lname, city FROM users WHERE email = %s",[username])
-			else:
-				cur.execute("SELECT userId, password, userStatus, userType, fname, lname, city FROM users WHERE contactNo = %s",[username])
-		except:
-			conn.rollback()
-			flash('Something went wrong','danger')
-			return redirect(url_for('login'))
 
-		result = cur.fetchone()
 
-		if result:
-			# Compate Passwords
-			if sha256_crypt.verify(password_candidate, result[1]):
-				session['logged_in'] = True
-				session['userId'] = result[0]
-				session['userStatus'] = result[2]
-				session['userType'] = result[3]
-				session['city'] = result[6]
+# User login
+# @app.route('/login', methods=['GET','POST'])
+# @is_not_logged_in
+# def login():
+# 	if request.method == 'POST':
+# 		# Get Form Fields
+# 		username = request.form['username']
+# 		password_candidate = request.form['password']
+
+# 		# Create cursor
+# 		cur = conn.cursor()
+
+# 		try:
+# 			# Get user by either Email or ContactNo
+# 			if '@' in username:
+# 				cur.execute("SELECT userId, password, userStatus, userType, fname, lname, city FROM users WHERE email = %s",[username])
+# 			else:
+# 				cur.execute("SELECT userId, password, userStatus, userType, fname, lname, city FROM users WHERE contactNo = %s",[username])
+# 		except:
+# 			conn.rollback()
+# 			flash('Something went wrong','danger')
+# 			return redirect(url_for('login'))
+
+# 		result = cur.fetchone()
+
+# 		if result:
+# 			# Compate Passwords
+# 			if sha256_crypt.verify(password_candidate, result[1]):
+# 				session['logged_in'] = True
+# 				session['userId'] = result[0]
+# 				session['userStatus'] = result[2]
+# 				session['userType'] = result[3]
+# 				session['city'] = result[6]
 				
-				msg = "Welcome {} {}".format(result[4],result[5])
-				flash(msg,'success')
+# 				msg = "Welcome {} {}".format(result[4],result[5])
+# 				flash(msg,'success')
 
-				return redirect(url_for('dashboard'))
-			else:
-				error = "Invalid login"
-				return render_template('login.html', error = error)
-			# Close connection
-		else:
-			error = "Username not found"
-			return render_template('login.html', error = error)
-	return render_template('login.html')
+# 				return redirect(url_for('dashboard'))
+# 			else:
+# 				error = "Invalid login"
+# 				return render_template('login.html', error = error)
+# 			# Close connection
+# 		else:
+# 			error = "Username not found"
+# 			return render_template('login.html', error = error)
+# 	return render_template('login.html')
 
 # Logout
 questions = [
@@ -233,6 +282,8 @@ questions = [
 
 @app.route('/api/questions/<int:index>', methods=['GET'])
 def get_question(index):
+    session['current_code_context']=""
+    app.logger.info("hello" ,session['current_code_context'])
     # Validate index
     if index < 0 or index >= len(questions):
         return jsonify({'error': 'Question not found'}), 404
@@ -291,13 +342,14 @@ def dashboard():
 
 @app.route('/api/submit-line', methods=['POST'])
 def handle_submit_line():
-    line = request.json['line']
-    app.logger.info("the line is" +line)
-    print("Received line:", line)
+    line = request.json.get('line', '')
+    app.logger.info(f"Received line: {line}")
+
     if line is not None:
+        app.logger.info(f"Line is not none: {line}")
         msg=add_line_of_code(line)
         app.logger.info(msg)
-
+        
     # Process the code here, for example, analyze it and generate suggestions
     suggestions = [{'id': 1, 'text': "", 'feedback': "Consider using a list comprehension."}]
 
@@ -329,11 +381,15 @@ def ask():
 
 
 def add_line_of_code(new_line):
-    g.current_code_context
-    app.logger.info("the addline of code" + g.current_code_context)
-    g.current_code_context += f"\n{new_line}"
-    app.logger.info("the addline of code after adding new line" + g.current_code_context)
-    parse_code_real_time(new_line)
+    # app.logger.info("the addline of code" + g.current_code_context)
+    # g.current_code_context += f"\n{new_line}"
+    # app.logger.info("the addline of code after adding new line" + g.current_code_context)
+    # parse_code_real_time(new_line)
+    session['current_code_context'] += f"\n{new_line}"
+    app.logger.info("The current code context after adding new line: " + session['current_code_context'])
+    # parse_code_real_time(new_line)
+
+    # Make sure to modify session data so Flask knows to save it
 
 
 def generate_optimization_prompt(code_snippet):
@@ -476,13 +532,13 @@ def on_code_segment_completed(code_segment):
 
 
 def parse_code_real_time(new_line):
-    g.last_indent_level
-    g.current_code_context
+    # g.last_indent_level
+    # g.current_code_context
     current_indent_level = len(new_line) - len(new_line.lstrip())
     block_ending_keywords = ['return', 'break', 'continue', 'pass', 'raise']
-    if (any(keyword in new_line for keyword in block_ending_keywords) or current_indent_level < g.last_indent_level) and g.current_code_context.strip() != "":
+    if (any(keyword in new_line for keyword in block_ending_keywords) or current_indent_level < g.last_indent_level) and session['current_code_context'].strip() != "":
         try:
-            wrapped_code = wrap_code_block(g.current_code_context)
+            wrapped_code = wrap_code_block(session['current_code_context'])
             tree = ast.parse(wrapped_code)
             for node in ast.walk(tree):
                 if isinstance(node, ast.FunctionDef):
@@ -502,4 +558,8 @@ def parse_code_real_time(new_line):
 if __name__ == '__main__':
 	app.secret_key = 'secret123'
 	port = int(os.environ.get("PORT",7070))
-	app.run(host='0.0.0.0', port=port, debug=True)
+	app.run(host='0.0.0.0', port=port)
+
+     
+    
+    

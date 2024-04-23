@@ -10,6 +10,9 @@ import CodeTabs from './components/CodeTabs';
 import questions from './data/questions';
 import SuggestionsTab from './components/SuggestionsTab'
 import { sendCodeToBackend } from './lib/codeHandler'
+import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-dom';
+axios.defaults.baseURL = 'http://localhost:7070';
+axios.defaults.withCredentials = true;
 
 function App() {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -30,6 +33,7 @@ function App() {
   const sendLineToBackend = async (line, lineNumber) => {
     try {
       const response = await axios.post('http://localhost:7070/api/submit-line', { line });
+      
       console.log("Line submitted, response:", response.data);
   
       // Set the response to show in a tooltip

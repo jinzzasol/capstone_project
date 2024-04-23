@@ -6,3 +6,5 @@ gunicorn
 psycopg2==2.9.3
 Flask-CORS
 openai
+Flask-Session
+redis
