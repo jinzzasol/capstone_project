@@ -47,7 +47,7 @@ app.config['SESSION_COOKIE_SECURE'] = True
 
 app.config['SESSION_CACHELIB']=FileSystemCache(threshold=1000, cache_dir="/sessions")
 
-openai.api_key = "sk-proj-le1ENBf3hFC1gxR46rWpT3BlbkFJGyNPZvs8NqXeNJvQuZk6"
+openai.api_key = ""
 CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}}, supports_credentials=True)
 Session(app)
 
