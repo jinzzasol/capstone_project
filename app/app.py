@@ -37,18 +37,17 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = '747b60ab7ef6e02cf56da6503adae95198fa6dad'
 app.config["OIDC_CLIENT_SECRETS"] = "client_secrets.json"
 app.secret_key = '747b60ab7ef6e02cf56da6503adae95198fa6dad'
-app.config['SESSION_TYPE'] = 'filesystem'
+app.config['SESSION_TYPE'] = 'cachelib'
+app.config['SESSION_SERIALIZATION_FORMAT']='json'
 app.config["OIDC_COOKIE_SECURE"] = False
 app.config["OIDC_CALLBACK_ROUTE"] = "/callback"
 app.config["OIDC_SCOPES"] = ["openid", "email", "profile"]
 app.config['SESSION_COOKIE_SAMESITE'] = 'None'
 app.config['SESSION_COOKIE_SECURE'] = True
 
-SESSION_TYPE = 'cachelib'
-SESSION_SERIALIZATION_FORMAT = 'json'
-SESSION_CACHELIB = FileSystemCache(threshold=500, cache_dir="/sessions"),
+app.config['SESSION_CACHELIB']=FileSystemCache(threshold=1000, cache_dir="/sessions")
 
-openai.api_key = "sk-proj-lWH9mbJpz79YYPlIO7qXT3BlbkFJpehXHUVqU1iWm7Ee1dqb"
+openai.api_key = "sk-proj-le1ENBf3hFC1gxR46rWpT3BlbkFJGyNPZvs8NqXeNJvQuZk6"
 CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}}, supports_credentials=True)
 Session(app)
 
@@ -73,11 +72,11 @@ Session(app)
 #     # app.logger.debug('Session ID: %s', session.sid if 'sid' in session else 'No session ID')
 
 
-print(f'\n\n\nTrying to connect to {os.environ.get("POSTGRES_HOST")}', file=sys.stderr)
-print(f'User: {os.environ.get("POSTGRES_USER")}', file=sys.stderr)
-print(f'Password: {os.environ.get("POSTGRES_PASSWORD")}', file=sys.stderr)
-print(f'Port: {os.environ.get("POSTGRES_PORT")}', file=sys.stderr)
-print('')
+# app.logger.info(f'\n\n\nTrying to connect to {os.environ.get("POSTGRES_HOST")}', file=sys.stderr)
+# app.logger.info(f'User: {os.environ.get("POSTGRES_USER")}', file=sys.stderr)
+# app.logger.info(f'Password: {os.environ.get("POSTGRES_PASSWORD")}', file=sys.stderr)
+# app.logger.info(f'Port: {os.environ.get("POSTGRES_PORT")}', file=sys.stderr)
+# app.logger.info('')
 
 startup_duration = 0
 timeout_s = 30
@@ -97,16 +96,15 @@ conn = None
 # 		)
 # 		break
 # 	except Exception as e:
-# 		print(f'Elapsed: {int(startup_duration)} / {timeout_s} seconds')
+# 		app.logger.info(f'Elapsed: {int(startup_duration)} / {timeout_s} seconds')
 # 		last_exception = e
 # 		time.sleep(1)
 # if conn is None:
-# 	print(f'Could not connect to the database within {timeout_s} seconds - {last_exception}')
+# 	app.logger.info(f'Could not connect to the database within {timeout_s} seconds - {last_exception}')
 # 	exit()
 
 # connection_status = ('Not connected', 'Connected')[conn.closed == 0]
-# print(f'Connection status: {connection_status}\n\n', file=sys.stderr, flush=True)
-
+# app.logger.info(f'Connection status: {connection_status}\n\n', file=sys.stderr, flush=True)
 # Index
 @app.route('/')
 def index():
@@ -272,6 +270,7 @@ questions = [
 @app.route('/api/questions/<int:index>', methods=['GET'])
 def get_question(index):
     session['current_code_context']=""
+    session['msg']=""
     session['last_indent_level'] = 0
     app.logger.info("hello %s %d", session['current_code_context'], session['last_indent_level'])
     # Validate index
@@ -331,18 +330,18 @@ def dashboard():
 def handle_submit_line():
     line = request.json.get('line', '')
     app.logger.info(f"Received line: {line}")
+    
 
     if line is not None:
         app.logger.info(f"Line is not none: {line}")
-        msg=add_line_of_code(line)
-        app.logger.info(f"Processed line, sending response: {msg}")
+        session['msg']=add_line_of_code(line)
+        app.logger.info(f"Processed line, sending response: ", session['msg'])
     # Process the code here, for example, analyze it and generate suggestions
-    suggestions = [{'id': 1, 'text': "", 'feedback': "Consider using a list comprehension."}]
 
     # Return the suggestions as part of the response
     return jsonify({
         "message": "Line processed successfully",
-        "suggestions": msg
+        "suggestions": session['msg']
     })
 
 
@@ -364,11 +363,10 @@ def handle_submit_line():
 #     except Exception as e:
 #         return jsonify({'error': str(e)})
 
-
 def add_line_of_code(new_line):
     session['current_code_context'] += f"\n{new_line}"
     app.logger.info("The current code context after adding new line: " + session['current_code_context'])
-    parse_code_real_time(new_line)
+    return parse_code_real_time(new_line)
 
 def generate_optimization_prompt(code_snippet):
     return [{
@@ -393,20 +391,20 @@ def optimize_code_with_feedback(code_snippet):
     
     while iteration_count < max_iterations:
         iteration_count += 1
-        print(f"\nOptimization Attempt #{iteration_count}\n{'-'*30}")
+        app.logger.info(f"\nOptimization Attempt #{iteration_count}\n{'-'*30}")
         optimization_suggestions = optimize_code_with_chatgpt(code_snippet + feedback)
-        print("Optimization Suggestions:\n", optimization_suggestions)
+        app.logger.info("Optimization Suggestions:\n", optimization_suggestions)
         
         user_input = input("Are you satisfied with the optimization suggestions? (yes/no/feedback): ")
         if user_input.lower() == 'yes':
-            print("Optimization process completed.")
+            app.logger.info("Optimization process completed.")
             return
         elif user_input.lower() == 'no':
             feedback = "\nThe optimization suggestions were not satisfactory."
         else:
             feedback = f"\nUser feedback: {user_input}"
     
-    print("Reached maximum optimization attempts.")
+    app.logger.info("Reached maximum optimization attempts.")
 
 
 def optimize_code_with_chatgpt(code_snippet):
@@ -450,6 +448,7 @@ def extract_and_group_feedback_corrected(text):
             current_feedback_item['code snippet'] = '\n'.join(code_snippet_lines) + '\n'
             # After storing a code snippet, consider the current feedback item complete
             feedback_items.append(current_feedback_item)
+            # app.logger.info("the feedback is ", feedback_items)
             current_feedback_item = {}  # Reset for the next feedback item
             continue
         # Collect code snippet lines
@@ -468,16 +467,17 @@ def extract_and_group_feedback_corrected(text):
         else:
             # Lines not matching any keywords or inside a code snippet block are ignored
             continue
-
     return feedback_items
 
 
 
 def on_code_segment_completed(code_segment):
     suggestions = analyze_code_segment(code_segment)
-    # print(suggestions)
+    # app.logger.info(suggestions)
     grouped_feedback_items = extract_and_group_feedback_corrected(suggestions)
-    print(grouped_feedback_items)
+    app.logger.info(grouped_feedback_items)
+    return grouped_feedback_items
+
 #     thread = Thread(target=threaded_code_analysis, args=(code_segment,))
 #     thread.start()
 
@@ -502,13 +502,12 @@ def parse_code_real_time(new_line):
             tree = ast.parse(wrapped_code)
             for node in ast.walk(tree):
                 if isinstance(node, ast.FunctionDef):
-                    print("***********************************************************************************************")
+                    app.logger.info("***********************************************************************************************")
                     app.logger.info("sending code...................")
-                    on_code_segment_completed(ast.unparse(node))
+                    return on_code_segment_completed(ast.unparse(node))
                     #current_code_context = ""
-                    break
         except SyntaxError as e:
-            print(f"Syntax Error: {e}")
+            app.logger.info(f"Syntax Error: {e}")
         finally:
             session['last_indent_level'] = 0
     else:         

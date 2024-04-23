@@ -2,7 +2,7 @@ import psycopg2 as pg2
 import os, sys
 from database_credentials import credentials
 
-print(f'\n\n\nTrying to connect to {os.environ.get("POSTGRES_HOST")}\n\n\n', file=sys.stderr)
+app.logger.info(f'\n\n\nTrying to connect to {os.environ.get("POSTGRES_HOST")}\n\n\n', file=sys.stderr)
 
 conn = pg2.connect(
 	database = os.environ.get('POSTGRES_DB'),
@@ -12,4 +12,4 @@ conn = pg2.connect(
 	port = os.environ.get('POSTGRES_PORT')
 )
 
-print('Connection status: ', conn.closed, file=sys.stderr, flush=True)
+app.logger.info('Connection status: ', conn.closed, file=sys.stderr, flush=True)
