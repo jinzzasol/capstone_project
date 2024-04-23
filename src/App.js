@@ -9,8 +9,8 @@ import CodeEditor from './components/CodeEditor';
 import CodeTabs from './components/CodeTabs';
 import questions from './data/questions';
 import SuggestionsTab from './components/SuggestionsTab'
-import { sendCodeToBackend } from './lib/codeHandler'
-import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-dom';
+//import { sendCodeToBackend } from './lib/codeHandler'
+//import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-dom';
 axios.defaults.baseURL = 'http://localhost:7070';
 axios.defaults.withCredentials = true;
 
@@ -34,12 +34,14 @@ function App() {
     try {
       const response = await axios.post('http://localhost:7070/api/submit-line', { line });
       
-      console.log("Line submitted, response:", response.data);
-  
-      // Set the response to show in a tooltip
-      setTooltipText(response.data.message); // Assuming the message is in response.data.message
-      setTooltipVisible(true);
-      setHighlightedLine(lineNumber); // Store the line number that should be highlighted
+      if (response.data) {
+        console.log("Line submitted, response:", response.data);
+        setTooltipText(response.data.message);  // Make sure 'message' is a valid key
+        setTooltipVisible(true);
+        setHighlightedLine(lineNumber);
+    } else {
+        console.error('No response data');
+    }
   
     } catch (error) {
       console.error('Error sending line to backend:', error);
