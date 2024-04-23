@@ -14,6 +14,8 @@ import openai
 import ast
 from flask_session import Session
 from cachelib.file import FileSystemCache
+from threading import Thread
+from flask import current_app
 
 import psycopg2 as pg2
 
@@ -46,7 +48,7 @@ SESSION_TYPE = 'cachelib'
 SESSION_SERIALIZATION_FORMAT = 'json'
 SESSION_CACHELIB = FileSystemCache(threshold=500, cache_dir="/sessions"),
 
-openai.api_key = ""
+openai.api_key = "sk-proj-lWH9mbJpz79YYPlIO7qXT3BlbkFJpehXHUVqU1iWm7Ee1dqb"
 CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}}, supports_credentials=True)
 Session(app)
 
@@ -64,25 +66,12 @@ Session(app)
 #     userinfo_endpoint='https://openidconnect.googleapis.com/v1/userinfo',
 #     client_kwargs={'scope': 'openid email profile'},
 # )
-
-openai.api_key = ""
 # @app.before_request
 # def before_request():
 #     # Initialize the variables for each request
 #     # app.logger.debug('Request path',session['current_code_context'])
 #     # app.logger.debug('Session ID: %s', session.sid if 'sid' in session else 'No session ID')
 
-@app.after_request
-def after_request(response):
-    app.logger.debug(f"After Request - Session Data: {dict(session)}")
-    return response
-# conn = pg2.connect(
-# 	database = credentials['database'],
-# 	user = credentials['user'],
-# 	password = credentials['password'],
-# 	host = credentials['host'],
-# 	port = credentials['port']
-# )
 
 print(f'\n\n\nTrying to connect to {os.environ.get("POSTGRES_HOST")}', file=sys.stderr)
 print(f'User: {os.environ.get("POSTGRES_USER")}', file=sys.stderr)
@@ -283,7 +272,8 @@ questions = [
 @app.route('/api/questions/<int:index>', methods=['GET'])
 def get_question(index):
     session['current_code_context']=""
-    app.logger.info("hello" ,session['current_code_context'])
+    session['last_indent_level'] = 0
+    app.logger.info("hello %s %d", session['current_code_context'], session['last_indent_level'])
     # Validate index
     if index < 0 or index >= len(questions):
         return jsonify({'error': 'Question not found'}), 404
@@ -313,7 +303,9 @@ def handle_submit():
     suggestions = [{'id': 1, 'text': msg, 'feedback': "Consider using a list comprehension."}]
 
     # Return the suggestions as part of the response
-    return jsonify({"message": "Submission received successfully", "submissionId": submissionId, "suggestions": suggestions})
+    return jsonify({"message": "Submission received successfully", "submissionId": submissionId, "suggestions": msg})
+
+
 @app.route('/api/suggestions/feedback', methods=['POST'])
 def handle_feedback():
     data = request.json
@@ -330,15 +322,10 @@ def logout():
 	flash('You are now Logged Out','success')
 	return redirect(url_for('login'))
 
-# Dashboard
 @app.route('/dashboard')
 @is_logged_in
 def dashboard():
 	return render_template('dashboard.html')
-
-# @app.route('/')
-# def index():
-#     return render_template('index.html')
 
 @app.route('/api/submit-line', methods=['POST'])
 def handle_submit_line():
@@ -348,49 +335,40 @@ def handle_submit_line():
     if line is not None:
         app.logger.info(f"Line is not none: {line}")
         msg=add_line_of_code(line)
-        app.logger.info(msg)
-        
+        app.logger.info(f"Processed line, sending response: {msg}")
     # Process the code here, for example, analyze it and generate suggestions
     suggestions = [{'id': 1, 'text': "", 'feedback': "Consider using a list comprehension."}]
 
     # Return the suggestions as part of the response
-    return jsonify({"message": "line processed successfully"})
+    return jsonify({
+        "message": "Line processed successfully",
+        "suggestions": msg
+    })
 
 
-@app.route('/ask', methods=['POST'])
-def ask():
-    data = request.json
-    code_snippet = data['code']
-    try:
-        response = openai.Completion.create(
-            engine="text-davinci-003",
-            prompt=code_snippet,
-            temperature=0.7,
-            max_tokens=150,
-            top_p=1.0,
-            frequency_penalty=0.0,
-            presence_penalty=0.0
-        )
-        return jsonify({'response': response.choices[0].text.strip()})
-    except Exception as e:
-        return jsonify({'error': str(e)})
-
-
-
-
+# @app.route('/ask', methods=['POST'])
+# def ask():
+#     data = request.json
+#     code_snippet = data['code']
+#     try:
+#         response = openai.Completion.create(
+#             engine="text-davinci-003",
+#             prompt=code_snippet,
+#             temperature=0.7,
+#             max_tokens=150,
+#             top_p=1.0,
+#             frequency_penalty=0.0,
+#             presence_penalty=0.0
+#         )
+#         return jsonify({'response': response.choices[0].text.strip()})
+#     except Exception as e:
+#         return jsonify({'error': str(e)})
 
 
 def add_line_of_code(new_line):
-    # app.logger.info("the addline of code" + g.current_code_context)
-    # g.current_code_context += f"\n{new_line}"
-    # app.logger.info("the addline of code after adding new line" + g.current_code_context)
-    # parse_code_real_time(new_line)
     session['current_code_context'] += f"\n{new_line}"
     app.logger.info("The current code context after adding new line: " + session['current_code_context'])
-    # parse_code_real_time(new_line)
-
-    # Make sure to modify session data so Flask knows to save it
-
+    parse_code_real_time(new_line)
 
 def generate_optimization_prompt(code_snippet):
     return [{
@@ -450,35 +428,6 @@ def optimize_code_with_chatgpt(code_snippet):
 def analyze_code_segment(segment):
     return optimize_code_with_chatgpt(segment)
 
-# def extract_and_group_feedback_corrected(text):
-#     lines = text.split('\n')
-#     keywords = ['LINE NUMBER(S):', 'SUGGESTION:', 'REASON:']
-#     grouped_feedback = []
-#     temp_dict = {}
-#     current_keyword = None  # Initialize current_keyword outside the for loop
-
-#     for line in lines:
-#         found_keyword = False
-#         for keyword in keywords:
-#             if keyword in line:
-#                 found_keyword = True
-#                 current_keyword = keyword.replace(':', '').lower().replace('(', '').replace(')s', '').replace(')', '').strip()
-#                 content = line.replace(keyword, '').split(')', 1)[-1].strip()
-#                 temp_dict[current_keyword] = content
-#                 break
-        
-#         if not found_keyword and current_keyword and line.strip():  # Append line to the current keyword's value
-#             temp_dict[current_keyword] += ' ' + line.strip()
-
-#         if current_keyword == 'reason':  # If 'reason' is encountered, finalize and store the current group
-#             if 'CODE SNIPPET:' in temp_dict.get('reason', ''):
-#                 temp_dict['reason'] = temp_dict['reason'].split('CODE SNIPPET:')[0].strip()
-#             grouped_feedback.append(temp_dict)
-#             temp_dict = {}
-#             current_keyword = None
-
-#     return grouped_feedback
-
 def extract_and_group_feedback_corrected(text):
     lines = text.split('\n')
     keywords = ['LINE NUMBER(S):', 'SUGGESTION:', 'REASON:']
@@ -529,36 +478,47 @@ def on_code_segment_completed(code_segment):
     # print(suggestions)
     grouped_feedback_items = extract_and_group_feedback_corrected(suggestions)
     print(grouped_feedback_items)
+#     thread = Thread(target=threaded_code_analysis, args=(code_segment,))
+#     thread.start()
+
+# def threaded_code_analysis(code_segment):
+#     try:
+#         current_app.logger.info("Thread started")
+#         suggestions = analyze_code_segment(code_segment)
+#         grouped_feedback_items = extract_and_group_feedback_corrected(suggestions)
+#         current_app.logger.info("Analysis completed: %s", grouped_feedback_items)
+#     except Exception as e:
+#         current_app.logger.error("Error in thread: %s", str(e))
 
 
 def parse_code_real_time(new_line):
-    # g.last_indent_level
-    # g.current_code_context
     current_indent_level = len(new_line) - len(new_line.lstrip())
     block_ending_keywords = ['return', 'break', 'continue', 'pass', 'raise']
-    if (any(keyword in new_line for keyword in block_ending_keywords) or current_indent_level < g.last_indent_level) and session['current_code_context'].strip() != "":
+    app.logger.info("last_indent_level " + str(session['last_indent_level']))
+
+    if (any(keyword in new_line for keyword in block_ending_keywords) or current_indent_level < session['last_indent_level']) and session['current_code_context'].strip() != "":
         try:
             wrapped_code = wrap_code_block(session['current_code_context'])
             tree = ast.parse(wrapped_code)
             for node in ast.walk(tree):
                 if isinstance(node, ast.FunctionDef):
                     print("***********************************************************************************************")
-                    # print(ast.unparse(node))
+                    app.logger.info("sending code...................")
                     on_code_segment_completed(ast.unparse(node))
                     #current_code_context = ""
                     break
         except SyntaxError as e:
             print(f"Syntax Error: {e}")
         finally:
-            g.last_indent_level = 0
+            session['last_indent_level'] = 0
     else:         
-        g.last_indent_level = current_indent_level
+        session['last_indent_level'] = current_indent_level
 
 
 if __name__ == '__main__':
 	app.secret_key = 'secret123'
 	port = int(os.environ.get("PORT",7070))
-	app.run(host='0.0.0.0', port=port)
+	app.run(host='0.0.0.0', port=port,use_reloader=True)
 
      
     
