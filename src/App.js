@@ -30,25 +30,71 @@ function App() {
   const [tooltipText, setTooltipText] = useState('');
   const [tooltipVisible, setTooltipVisible] = useState(false);
   
-  const sendLineToBackend = async (line, lineNumber) => {
-    try {
-      const response = await axios.post('http://localhost:7070/api/submit-line', { line });
+  // const sendLineToBackend = async (line, lineNumber) => {
+  //   try {
+  //     const response = await axios.post('http://localhost:7070/api/submit-line', { line });
       
-      if (response.data) {
-        console.log("Line submitted, response:", response.data);
-        setTooltipText(response.data.message);  // Make sure 'message' is a valid key
-        setTooltipVisible(true);
-        setHighlightedLine(lineNumber);
-    } else {
-        console.error('No response data');
-    }
+  //     if (response.data) {
+  //       console.log("Line submitted, response:", response.data);
+  //       setTooltipText(response.data.message);  // Make sure 'message' is a valid key
+  //       setTooltipVisible(true);
+  //       setHighlightedLine(lineNumber);
+  //   } else {
+  //       console.error('No response data');
+  //   }
   
-    } catch (error) {
-      console.error('Error sending line to backend:', error);
-      setTooltipText("Error submitting line.");
-      setTooltipVisible(true);
+  //   } catch (error) {
+  //     console.error('Error sending line to backend:', error);
+  //     setTooltipText("Error submitting line.");
+  //     setTooltipVisible(true);
+  //   }
+  // };
+
+  // Helper function to parse line numbers and return them if they are numeric
+function parseLineNumbers(lineNumbers) {
+  // If the line number is purely numeric, parse and return it
+  if (!isNaN(lineNumbers)) {
+    return parseInt(lineNumbers, 10);
+  } else {
+    // Since the line number is not numeric, return null and handle as a descriptive text
+    return null;
+  }
+}
+
+const sendLineToBackend = async (line, lineNumber) => {
+  try {
+    const response = await axios.post('http://localhost:7070/api/submit-line', { line });
+
+    if (response.data) {
+      console.log("Line submitted, response:", response.data);
+
+      // Check if suggestions are present
+      if (response.data.suggestions && response.data.suggestions.length > 0) {
+        response.data.suggestions.forEach(suggestion => {
+          if (suggestion['line numbers']) {
+            const lineNum = parseLineNumbers(suggestion['line numbers']);
+            if (lineNum !== null) {
+              setHighlightedLine(lineNum);
+            } else {
+              // Handle non-numeric line number info (set tooltip to suggestion)
+              console.log('Line numbers info:', suggestion['line numbers']);
+              setTooltipText(suggestion['suggestion']); // Set tooltip text to the message from suggestion
+              setTooltipVisible(true); // Show the tooltip
+            }
+          }
+        });
+      } else {
+        console.log('Received response but no suggestions to process.');
+      }
+    } else {
+      console.error('No response data');
     }
-  };
+  } catch (error) {
+    console.error('Error sending line to backend:', error);
+    // Log the error without showing any tooltip or highlighting
+  }
+};
+
   
 
   // Function to fetch question details

@@ -6789,34 +6789,34 @@ button.bg-dark:focus {
     }
 }
 
-@media print {
-    .d-print-none {
+@media app.logger.info {
+    .d-app.logger.info-none {
         display: none !important
     }
-    .d-print-inline {
+    .d-app.logger.info-inline {
         display: inline !important
     }
-    .d-print-inline-block {
+    .d-app.logger.info-inline-block {
         display: inline-block !important
     }
-    .d-print-block {
+    .d-app.logger.info-block {
         display: block !important
     }
-    .d-print-table {
+    .d-app.logger.info-table {
         display: table !important
     }
-    .d-print-table-row {
+    .d-app.logger.info-table-row {
         display: table-row !important
     }
-    .d-print-table-cell {
+    .d-app.logger.info-table-cell {
         display: table-cell !important
     }
-    .d-print-flex {
+    .d-app.logger.info-flex {
         display: -webkit-box !important;
         display: -ms-flexbox !important;
         display: flex !important
     }
-    .d-print-inline-flex {
+    .d-app.logger.info-inline-flex {
         display: -webkit-inline-box !important;
         display: -ms-inline-flexbox !important;
         display: inline-flex !important
@@ -9253,7 +9253,7 @@ a.text-dark:focus {
     visibility: hidden !important
 }
 
-@media print {
+@media app.logger.info {
     *,
     *::before,
     *::after {
