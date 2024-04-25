@@ -29,6 +29,7 @@ function App() {
   const [highlightedLine, setHighlightedLine] = useState(null);
   const [tooltipText, setTooltipText] = useState('');
   const [tooltipVisible, setTooltipVisible] = useState(false);
+
   
   // const sendLineToBackend = async (line, lineNumber) => {
   //   try {
@@ -51,48 +52,50 @@ function App() {
   // };
 
   // Helper function to parse line numbers and return them if they are numeric
-function parseLineNumbers(lineNumbers) {
-  // If the line number is purely numeric, parse and return it
-  if (!isNaN(lineNumbers)) {
-    return parseInt(lineNumbers, 10);
-  } else {
-    // Since the line number is not numeric, return null and handle as a descriptive text
-    return null;
+  function parseLineNumbers(lineNumbers) {
+    if (lineNumbers.includes('-')) {
+      const range = lineNumbers.split('-').map(Number);
+      return Array.from({ length: (range[1] - range[0] + 1) }, (_, i) => range[0] + i);
+    } else if (!isNaN(lineNumbers)) {
+      return [parseInt(lineNumbers, 10)];
+    }
+    return [];
   }
-}
+  
 
 const sendLineToBackend = async (line, lineNumber) => {
   try {
+    console.log("fetching response")
     const response = await axios.post('http://localhost:7070/api/submit-line', { line });
+    console.log("Full Response:", response);  
 
-    if (response.data) {
-      console.log("Line submitted, response:", response.data);
+    if (response.data && response.data.suggestions) {
+      console.log("Suggestions Received:", response.data.suggestions);  
 
-      // Check if suggestions are present
-      if (response.data.suggestions && response.data.suggestions.length > 0) {
-        response.data.suggestions.forEach(suggestion => {
-          if (suggestion['line numbers']) {
-            const lineNum = parseLineNumbers(suggestion['line numbers']);
-            if (lineNum !== null) {
-              setHighlightedLine(lineNum);
-            } else {
-              // Handle non-numeric line number info (set tooltip to suggestion)
-              console.log('Line numbers info:', suggestion['line numbers']);
-              setTooltipText(suggestion['suggestion']); // Set tooltip text to the message from suggestion
-              setTooltipVisible(true); // Show the tooltip
-            }
-          }
-        });
+      if (response.data.suggestions.length > 0) {
+        // Handling multiple suggestions
+        setSuggestions(response.data.suggestions);
+        setCurrentSuggestionIndex(0);  // Reset the index to 0
+        updateTooltipBasedOnSuggestion(response.data.suggestions[0]);  // to update tooltip for the first suggestion
       } else {
         console.log('Received response but no suggestions to process.');
+        setTooltipVisible(false);  // to hide the tooltip if no suggestions
       }
     } else {
-      console.error('No response data');
+      console.log('No valid suggestions found in the response:', response.data);
+      setTooltipVisible(false);  // to hide the tooltip if no valid data
     }
   } catch (error) {
     console.error('Error sending line to backend:', error);
-    // Log the error without showing any tooltip or highlighting
+    setTooltipVisible(false);  // to hide tooltip on error
   }
+};
+
+const updateTooltipBasedOnSuggestion = (suggestion) => {
+  const lineNumbers = parseLineNumbers(suggestion['line numbers']);
+  setHighlightedLine(lineNumbers); // to handle an array of line numbers
+  setTooltipText(suggestion.suggestion);
+  setTooltipVisible(true);
 };
 
   
@@ -106,7 +109,6 @@ const sendLineToBackend = async (line, lineNumber) => {
         title: response.data.title,
         description: response.data.description
       });
-      // Assuming the API also returns a starter code snippet for the question
       setCode(response.data.starterCode || '');
     } catch (error) {
       console.error('There was an error fetching question details:', error);
@@ -127,6 +129,26 @@ const sendLineToBackend = async (line, lineNumber) => {
 
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+const [currentSuggestionIndex, setCurrentSuggestionIndex] = useState(0);
+
+const handleNextSuggestion = () => {
+  setCurrentSuggestionIndex((prevIndex) => {
+    // Check if the new index would go out of bounds
+    const newIndex = prevIndex + 1 < suggestions.length ? prevIndex + 1 : prevIndex;
+    return newIndex;
+  });
+};
+
+const handlePreviousSuggestion = () => {
+  setCurrentSuggestionIndex((prevIndex) => {
+    // Check if the new index would be less than 0
+    const newIndex = prevIndex - 1 >= 0 ? prevIndex - 1 : prevIndex;
+    return newIndex;
+  });
+};
+
+  
+
   const sampleSuggestion = [
     { id: 1, text: "Here's a suggestion to improve your code!", feedback: null },
   ];
@@ -176,6 +198,18 @@ const sendLineToBackend = async (line, lineNumber) => {
   const handleCloseSuggestions = () => {
     setShowSuggestions(false); 
   };
+  //use effect for suggestion navigation
+  useEffect(() => {
+    if (suggestions.length > 0 && currentSuggestionIndex < suggestions.length) {
+      const activeSuggestion = suggestions[currentSuggestionIndex];
+      setTooltipText(activeSuggestion.suggestion);
+
+      const lineNum = parseLineNumbers(activeSuggestion['line numbers']);
+      setHighlightedLine(lineNum);
+      setTooltipVisible(true);
+    }
+  }, [currentSuggestionIndex, suggestions]);
+
 
   
   return (
@@ -197,15 +231,20 @@ const sendLineToBackend = async (line, lineNumber) => {
           <div className="main-container">
             <div className="code-editor-container" style={{flex: isSuggestionsVisible ? '0.5' : '1'}}>
             <CodeEditor
-              language={activeLanguage}
-              code={code}
-              setCode={setCode}
-              highlightedLine={highlightedLine}
-              tooltipText={tooltipText}
-              tooltipVisible={tooltipVisible}
-              setTooltipVisible={setTooltipVisible}
-              onNewLineAdded={sendLineToBackend}
-            />
+  language={activeLanguage}
+  code={code}
+  setCode={setCode}
+  highlightedLine={highlightedLine}
+  tooltipText={tooltipText}
+  tooltipVisible={tooltipVisible}
+  setTooltipVisible={setTooltipVisible}
+  handleNextSuggestion={handleNextSuggestion}
+  handlePreviousSuggestion={handlePreviousSuggestion}
+  currentSuggestionIndex={currentSuggestionIndex}
+  suggestions={suggestions}
+  onNewLineAdded={sendLineToBackend}
+/>
+
             </div>
           </div>
           {showSuggestions && (

@@ -17,9 +17,13 @@ const CodeEditor = ({
   onNewLineAdded,
   highlightedLine,
   tooltipText,
+  tooltipVisible,
   setTooltipVisible,
-  tooltipVisible
-}) => {
+  handleNextSuggestion,
+  handlePreviousSuggestion,
+  currentSuggestionIndex,
+  suggestions
+}) =>  {
   const editorRef = useRef(null);
   const [tooltipPosition, setTooltipPosition] = useState({ left: 0, top: 0 });
 
@@ -43,26 +47,29 @@ const CodeEditor = ({
       onNewLineAdded(currentLine, lines.length - 2);
     }
   };
-  const markerIdRef = useRef(null);
+  const markerIdRef = useRef([]);
 
   useEffect(() => {
     const editor = editorRef.current && editorRef.current.editor;
     const session = editor && editor.getSession();
     const Range = ace.require('ace/range').Range;
   
-    // Initialize a ref to store the current marker ID
-
+    // Clear existing markers
+    if (markerIdRef.current.length) {
+      markerIdRef.current.forEach(marker => session.removeMarker(marker));
+    }
+    markerIdRef.current = [];
   
-    if (session && highlightedLine !== null) {
-      // Remove the existing marker if it exists
-      if (markerIdRef.current !== null) {
-        session.removeMarker(markerIdRef.current);
-      }
-  
-      // Highlight the new line and update the marker ID
-      markerIdRef.current = session.addMarker(new Range(highlightedLine, 0, highlightedLine, 1), "highlighted-line", "fullLine");
+    // Check if highlighted lines are provided and are in an array
+    if (session && Array.isArray(highlightedLine) && highlightedLine.length > 0) {
+      // Add new markers for each line
+      highlightedLine.forEach(line => {
+        const markerId = session.addMarker(new Range(line - 1, 0, line - 1, 1), "highlighted-line", "fullLine");
+        markerIdRef.current.push(markerId);
+      });
     }
   }, [highlightedLine]);
+  
   // Effect for showing tooltips
   useEffect(() => {
     if (tooltipVisible && editorRef.current) {
@@ -111,11 +118,15 @@ const CodeEditor = ({
         }}
       />
       {tooltipVisible && (
-        <div className="tooltip" style={{  position: 'absolute', left: tooltipPosition.left, top: tooltipPosition.top }}>
-          {tooltipText}
-          <button className="tooltip-close-button" onClick={handleCloseTooltip}>&times;</button>
-        </div>
-      )}
+  <div className="tooltip" style={{ position: 'absolute', left: tooltipPosition.left, top: tooltipPosition.top }}>
+    {tooltipText}
+    <button className="tooltip-close-button" onClick={handleCloseTooltip}>&times;</button>
+    <br></br>
+    <button className='button-nav' onClick={handlePreviousSuggestion} disabled={currentSuggestionIndex === 0}>&lt; </button>
+    <button className='button-nav' onClick={handleNextSuggestion} disabled={currentSuggestionIndex === suggestions.length - 1}> &gt;</button>
+  </div>
+)}
+
     </>
   );
 };
