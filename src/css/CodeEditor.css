@@ -46,3 +46,24 @@
     opacity: 1;
     transform: scale(1);
   }
+
+  .button-nav {
+  background-color: transparent;
+  border: none; 
+  color: #fffafa;
+  font-size: 24px;
+  cursor: pointer; 
+  outline: none; 
+  transition: color 0.3s; 
+}
+
+/* Hover effect for buttons */
+.button-nav:hover {
+  color: #555; 
+}
+
+/* Disabled button styling */
+.button-nav:disabled {
+  color: #ccc; 
+  cursor: not-allowed;
+}
