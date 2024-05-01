@@ -1,0 +1,48 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ChatGPT Code Helper</title>
+</head>
+<body>
+    <h1>Send a Code Snippet to ChatGPT</h1>
+    <form id="codeForm">
+        <textarea id="codeSnippet" rows="10" cols="50"></textarea><br>
+        <button type="submit">Send to ChatGPT</button>
+    </form>
+    <div id="response"></div>
+
+    <script>
+        document.getElementById('codeForm').onsubmit = async function(e) {
+            e.preventDefault();
+            const code = document.getElementById('codeSnippet').value;
+            const response = await fetch('/ask', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({code: code}),
+            });
+            const data = await response.json();
+            document.getElementById('response').textContent = data.response || data.error;
+        };
+    </script>
+</body>
+</html>
+
+
+            {% if session.logged_in %}
+                <div class="text-center">
+                    <a class="btn btn-lg btn-success" href="/shareRide">Share Ride</a>
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+                    <a class="btn btn-lg btn-primary" href="/nearbyRides">Nearby Rides</a>
+                </div>
+            {% else %}
+            {% endif %}
+        </div>
+
+    <hr>
+{% endblock %}

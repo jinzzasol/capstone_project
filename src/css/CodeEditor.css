@@ -1,0 +1,69 @@
+/*CodeEditor.css*/
+
+.ace-editor {
+    width: 100% !important;
+    height: 680px !important;
+
+}
+.highlighted-line {
+    position: absolute;
+    background-color: #fffa5f; /* Bright color for high visibility */
+    opacity: 0.5; /* Slightly see-through so text is readable */
+  }
+  .tooltip {
+    position: fixed;  
+    z-index: 1050;   
+    padding: 8px 12px;
+    background-color: #81ab7d;
+    color: white;
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+    pointer-events: auto; 
+    margin-top: 100px;
+    margin-left: 300px;
+
+}
+
+.tooltip-close-button {
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 16px;
+    position: absolute;
+    top: 2px;
+    right: 5px;
+}
+
+  /* Optional: animations for the tooltip to gently fade in or scale up */
+  .tooltip-enter {
+    opacity: 0;
+    transform: scale(0.96);
+    transition: opacity 0.3s, transform 0.3s;
+  }
+  
+  .tooltip-enter-active {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .button-nav {
+  background-color: transparent;
+  border: none; 
+  color: #fffafa;
+  font-size: 24px;
+  cursor: pointer; 
+  outline: none; 
+  transition: color 0.3s; 
+}
+
+/* Hover effect for buttons */
+.button-nav:hover {
+  color: #555; 
+}
+
+/* Disabled button styling */
+.button-nav:disabled {
+  color: #ccc; 
+  cursor: not-allowed;
+}

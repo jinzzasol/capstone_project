@@ -1,0 +1,27 @@
+/* CodeTabs.css */
+.code-tabs {
+    display: flex;
+    justify-content: space-evenly;
+    background-color: #282c34;
+    padding: 10px;
+  }
+  
+  .code-tabs button {
+    background: none;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    cursor: pointer;
+  }
+  
+  .code-tabs button.active {
+    border-bottom: 2px solid #61dafb; 
+  }
+  
+  .description-tab .symbol {
+    color:#61DBFB;
+  }
+  
+  .description-tab .code-text {
+    color: white; 
+  }
