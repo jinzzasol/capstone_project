@@ -23,11 +23,3 @@ services:
       - type: bind
         source: ./app
         target: /app
-
-  frontend:
-    build:
-      context: .
-      dockerfile: Dockerfile.react
-    ports:
-      - "3000:3000"
-    restart: always
