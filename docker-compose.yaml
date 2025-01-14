@@ -15,21 +15,10 @@ services:
       - PYTHONUNBUFFERED=1
       - GUNICORN_WORKERS=4
       - GUNICORN_TIMEOUT=120
-      - POSTGRES_HOST=db
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_DB=ridesharedb
-      - POSTGRES_PORT=5432
       - CORS_ORIGINS=http://52.91.5.78:3000,http://localhost:3000
-    volumes:
-      - ./app:/app
-      - app_data:/app/data
     restart: unless-stopped
     logging:
       driver: "json-file"
       options:
         max-size: "10m"
         max-file: "3"
-
-volumes:
-  app_data:

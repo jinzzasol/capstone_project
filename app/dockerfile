@@ -23,8 +23,5 @@ ENV FLASK_ENV=production
 
 EXPOSE 7070
 
-# Create volume directory
-RUN mkdir -p /app/data
-
-# Command to run the application
+# Run with Gunicorn
 CMD ["gunicorn", "--bind", "0.0.0.0:7070", "--workers", "4", "--timeout", "120", "--log-level", "debug", "app:app"]

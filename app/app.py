@@ -513,10 +513,4 @@ def parse_code_real_time(new_line):
 
 
 if __name__ == '__main__':
-	app.secret_key = os.getenv('FLASK_SECRET_KEY', 'your-default-secret-key')
-	port = int(os.environ.get("PORT",7070))
-	app.run(host='0.0.0.0', port=port,use_reloader=True)
-
-     
-    
-    
+    app.run(host='0.0.0.0', port=7070, debug=True)
