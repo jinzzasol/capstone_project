@@ -53,11 +53,16 @@ function App() {
 
   // Helper function to parse line numbers and return them if they are numeric
   function parseLineNumbers(lineNumbers) {
-    if (lineNumbers.includes('-')) {
-      const range = lineNumbers.split('-').map(Number);
-      return Array.from({ length: (range[1] - range[0] + 1) }, (_, i) => range[0] + i);
-    } else if (!isNaN(lineNumbers)) {
-      return [parseInt(lineNumbers, 10)];
+    if (!lineNumbers) return [];
+    
+    const lineStr = String(lineNumbers);
+    if (lineStr.includes('-')) {
+      const range = lineStr.split('-').map(Number);
+      if (range.length === 2 && !isNaN(range[0]) && !isNaN(range[1])) {
+        return Array.from({ length: (range[1] - range[0] + 1) }, (_, i) => range[0] + i);
+      }
+    } else if (!isNaN(lineStr)) {
+      return [parseInt(lineStr, 10)];
     }
     return [];
   }
