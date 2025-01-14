@@ -10,7 +10,8 @@ services:
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - FLASK_SECRET_KEY=${FLASK_SECRET_KEY}
-      - FLASK_DEBUG=true
+      - FLASK_ENV=production
+      - FLASK_DEBUG=0
       - POSTGRES_HOST=db
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_USER=postgres
