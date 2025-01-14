@@ -20,6 +20,7 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_DB=ridesharedb
       - POSTGRES_PORT=5432
+      - CORS_ORIGINS=http://52.91.5.78:3000,http://localhost:3000
     restart: unless-stopped
     volumes:
       - type: bind
