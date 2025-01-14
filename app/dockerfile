@@ -4,7 +4,9 @@ WORKDIR /app
 
 RUN apt-get update && \
     apt-get install -y gcc python3-dev libpq-dev && \
-    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/* && \
+    mkdir -p /tmp/flask_session && \
+    chmod 777 /tmp/flask_session
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
@@ -14,7 +16,8 @@ COPY . .
 ENV PYTHONUNBUFFERED=1
 ENV FLASK_APP=app.py
 ENV FLASK_ENV=production
+ENV FLASK_DEBUG=0
 
 EXPOSE 7070
 
-CMD ["python", "-m", "gunicorn", "--bind", "0.0.0.0:7070", "--workers", "4", "--timeout", "120", "app:app"]
+CMD ["python", "-m", "gunicorn", "--bind", "0.0.0.0:7070", "--workers", "4", "--timeout", "120", "--log-level", "info", "app:app"]

@@ -53,15 +53,7 @@ app.config['SESSION_COOKIE_SAMESITE'] = 'None'
 app.config['SESSION_COOKIE_SECURE'] = True
 
 app.config['SESSION_CACHELIB']=FileSystemCache(threshold=1000, cache_dir="/sessions")
-CORS(app, 
-     resources={r"/api/*": {
-         "origins": ["http://52.91.5.78:3000", "http://localhost:3000"],
-         "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-         "allow_headers": ["Content-Type", "Authorization", "Access-Control-Allow-Origin"],
-         "supports_credentials": True,
-         "expose_headers": ["Content-Range", "X-Content-Range"]
-     }},
-     supports_credentials=True)
+CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}}, supports_credentials=True)
 Session(app)
 
 
@@ -282,8 +274,8 @@ questions = [
 
 @app.route('/api/questions/<int:index>', methods=['GET'])
 def get_question(index):
-    session['current_code_context'] = ""
-    session['msg'] = ""
+    session['current_code_context']=""
+    session['msg']=""
     session['last_indent_level'] = 0
     app.logger.info("hello %s %d", session['current_code_context'], session['last_indent_level'])
     # Validate index
@@ -307,7 +299,7 @@ def handle_submit():
     question = next((q for q in questions if q["id"] == questionId), None)
     if question is not None:
             description = question["description"]
-            msg = parse_code_real_time(code)
+            msg=parse_code_real_time(code)
             app.logger.info(msg)
 
     # Process the code here, for example, analyze it and generate suggestions
@@ -344,35 +336,40 @@ def handle_submit_line():
     line = request.json.get('line', '')
     app.logger.info(f"Received line: {line}")
     
+
     if line is not None:
         app.logger.info(f"Line is not none: {line}")
-        if 'current_code_context' not in session:
-            session['current_code_context'] = ''
-        if 'last_indent_level' not in session:
-            session['last_indent_level'] = 0
-        session['msg'] = add_line_of_code(line)
-        app.logger.info(f"Processed line, sending response: {session['msg']}")
+        session['msg']=add_line_of_code(line)
+        app.logger.info(f"Processed line, sending response: ", session['msg'])
+    # Process the code here, for example, analyze it and generate suggestions
 
+    # Return the suggestions as part of the response
     return jsonify({
         "message": "Line processed successfully",
-        "suggestions": session.get('msg', '')
+        "suggestions": session['msg']
     })
 
-@app.before_request
-def before_request():
-    # Initialize session variables if they don't exist
-    if 'current_code_context' not in session:
-        session['current_code_context'] = ''
-    if 'last_indent_level' not in session:
-        session['last_indent_level'] = 0
-    if 'msg' not in session:
-        session['msg'] = ''
+
+# @app.route('/ask', methods=['POST'])
+# def ask():
+#     data = request.json
+#     code_snippet = data['code']
+#     try:
+#         response = openai.Completion.create(
+#             engine="text-davinci-003",
+#             prompt=code_snippet,
+#             temperature=0.7,
+#             max_tokens=150,
+#             top_p=1.0,
+#             frequency_penalty=0.0,
+#             presence_penalty=0.0
+#         )
+#         return jsonify({'response': response.choices[0].text.strip()})
+#     except Exception as e:
+#         return jsonify({'error': str(e)})
 
 def add_line_of_code(new_line):
-    if 'current_code_context' not in session:
-        session['current_code_context'] = new_line
-    else:
-        session['current_code_context'] += f"\n{new_line}"
+    session['current_code_context'] += f"\n{new_line}"
     app.logger.info("The current code context after adding new line: " + session['current_code_context'])
     return parse_code_real_time(new_line)
 
@@ -500,33 +497,33 @@ def on_code_segment_completed(code_segment):
 
 
 def parse_code_real_time(new_line):
-    try:
-        current_indent_level = len(new_line) - len(new_line.lstrip())
-        block_ending_keywords = ['return', 'break', 'continue', 'pass', 'raise']
-        app.logger.info("last_indent_level " + str(session.get('last_indent_level', 0)))
+    current_indent_level = len(new_line) - len(new_line.lstrip())
+    block_ending_keywords = ['return', 'break', 'continue', 'pass', 'raise']
+    app.logger.info("last_indent_level " + str(session['last_indent_level']))
 
-        if (any(keyword in new_line for keyword in block_ending_keywords) or 
-            current_indent_level < session.get('last_indent_level', 0)) and session['current_code_context'].strip() != "":
-            try:
-                wrapped_code = wrap_code_block(session['current_code_context'])
-                tree = ast.parse(wrapped_code)
-                for node in ast.walk(tree):
-                    if isinstance(node, ast.FunctionDef):
-                        app.logger.info("***********************************************************************************************")
-                        app.logger.info("sending code...................")
-                        return on_code_segment_completed(ast.unparse(node))
-            except SyntaxError as e:
-                app.logger.info(f"Syntax Error: {e}")
-                return f"Syntax Error: {e}"
-            finally:
-                session['last_indent_level'] = 0
-        else:         
-            session['last_indent_level'] = current_indent_level
-            return ""
-    except Exception as e:
-        app.logger.error(f"Error in parse_code_real_time: {str(e)}")
-        return f"Error: {str(e)}"
+    if (any(keyword in new_line for keyword in block_ending_keywords) or current_indent_level < session['last_indent_level']) and session['current_code_context'].strip() != "":
+        try:
+            wrapped_code = wrap_code_block(session['current_code_context'])
+            tree = ast.parse(wrapped_code)
+            for node in ast.walk(tree):
+                if isinstance(node, ast.FunctionDef):
+                    app.logger.info("***********************************************************************************************")
+                    app.logger.info("sending code...................")
+                    return on_code_segment_completed(ast.unparse(node))
+                    #current_code_context = ""
+        except SyntaxError as e:
+            app.logger.info(f"Syntax Error: {e}")
+        finally:
+            session['last_indent_level'] = 0
+    else:         
+        session['last_indent_level'] = current_indent_level
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=7070, debug=True)
+	app.secret_key = os.getenv('FLASK_SECRET_KEY', 'your-default-secret-key')
+	port = int(os.environ.get("PORT",7070))
+	app.run(host='0.0.0.0', port=port,use_reloader=True)
+
+     
+    
+    
