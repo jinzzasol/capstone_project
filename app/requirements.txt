@@ -8,3 +8,4 @@ Flask-CORS
 openai>=1.0.0
 Flask-Session
 redis
+python-dotenv
