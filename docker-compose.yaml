@@ -21,13 +21,15 @@ services:
       - POSTGRES_DB=ridesharedb
       - POSTGRES_PORT=5432
       - CORS_ORIGINS=http://52.91.5.78:3000,http://localhost:3000
-    restart: unless-stopped
     volumes:
-      - type: bind
-        source: ./app
-        target: /app
+      - ./app:/app
+      - app_data:/app/data
+    restart: unless-stopped
     logging:
       driver: "json-file"
       options:
         max-size: "10m"
         max-file: "3"
+
+volumes:
+  app_data:

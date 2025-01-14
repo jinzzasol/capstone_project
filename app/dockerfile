@@ -11,8 +11,7 @@ RUN apt-get update && apt-get install -y \
 
 # Copy requirements first to leverage Docker cache
 COPY requirements.txt .
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
 COPY . .
@@ -24,12 +23,8 @@ ENV FLASK_ENV=production
 
 EXPOSE 7070
 
-# Use shell form to see potential errors
-CMD gunicorn \
-    --bind 0.0.0.0:7070 \
-    --workers ${GUNICORN_WORKERS:-4} \
-    --timeout ${GUNICORN_TIMEOUT:-120} \
-    --log-level debug \
-    --error-logfile - \
-    --access-logfile - \
-    app:app
+# Create volume directory
+RUN mkdir -p /app/data
+
+# Command to run the application
+CMD ["gunicorn", "--bind", "0.0.0.0:7070", "--workers", "4", "--timeout", "120", "--log-level", "debug", "app:app"]
