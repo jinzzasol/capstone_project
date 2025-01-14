@@ -5,6 +5,6 @@ gunicorn
 # psycopg2-binary # This doesn't work with M1 Macbooks
 psycopg2==2.9.3
 Flask-CORS
-openai
+openai>=1.0.0
 Flask-Session
 redis
