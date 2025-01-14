@@ -53,13 +53,15 @@ app.config['SESSION_COOKIE_SAMESITE'] = 'None'
 app.config['SESSION_COOKIE_SECURE'] = True
 
 app.config['SESSION_CACHELIB']=FileSystemCache(threshold=1000, cache_dir="/sessions")
-CORS(app, resources={
-    r"/api/*": {
-        "origins": ["http://52.91.5.78:3000", "http://localhost:3000"],
-        "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-        "allow_headers": ["Content-Type", "Authorization"]
-    }
-})
+CORS(app, 
+     resources={r"/api/*": {
+         "origins": ["http://52.91.5.78:3000", "http://localhost:3000"],
+         "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+         "allow_headers": ["Content-Type", "Authorization", "Access-Control-Allow-Origin"],
+         "supports_credentials": True,
+         "expose_headers": ["Content-Range", "X-Content-Range"]
+     }},
+     supports_credentials=True)
 Session(app)
 
 
