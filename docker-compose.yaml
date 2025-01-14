@@ -10,13 +10,15 @@ services:
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - FLASK_SECRET_KEY=${FLASK_SECRET_KEY}
+      - FLASK_APP=app.py
       - FLASK_ENV=production
-      - FLASK_DEBUG=0
+      - GUNICORN_CMD_ARGS="--workers=4 --bind=0.0.0.0:7070 --timeout=120"
       - POSTGRES_HOST=db
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_DB=ridesharedb
       - POSTGRES_PORT=5432
+    restart: always
     volumes:
       - type: bind
         source: ./app
