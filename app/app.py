@@ -53,29 +53,23 @@ app.config['SESSION_COOKIE_SAMESITE'] = 'None'
 app.config['SESSION_COOKIE_SECURE'] = True
 
 app.config['SESSION_CACHELIB']=FileSystemCache(threshold=1000, cache_dir="/sessions")
-CORS(app, 
-     resources={
-         r"/*": {  # Allow CORS for all routes
-             "origins": ["http://52.91.5.78:3000", "http://localhost:3000"],
-             "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-             "allow_headers": ["Content-Type", "Authorization", "Access-Control-Allow-Origin", 
-                             "Access-Control-Allow-Methods", "Access-Control-Allow-Headers",
-                             "Access-Control-Allow-Credentials"],
-             "expose_headers": ["Content-Range", "X-Content-Range"],
-             "supports_credentials": True,
-             "send_wildcard": False,
-             "max_age": 86400
-         }
-     },
-     supports_credentials=True)
-
-# Initialize session
+CORS(app, resources={r"/api/*": {"origins": ["http://52.91.5.78:3000"]}}, supports_credentials=True)
 Session(app)
+
+@app.before_request
+def before_request():
+    # Initialize session variables if they don't exist
+    if 'current_code_context' not in session:
+        session['current_code_context'] = ''
+    if 'last_indent_level' not in session:
+        session['last_indent_level'] = 0
+    if 'msg' not in session:
+        session['msg'] = ''
 
 @app.after_request
 def after_request(response):
-    response.headers.add('Access-Control-Allow-Origin', 'http://localhost:3000')
-    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+    response.headers.add('Access-Control-Allow-Origin', 'http://52.91.5.78:3000')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
     response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
     response.headers.add('Access-Control-Allow-Credentials', 'true')
     return response
