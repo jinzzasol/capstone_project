@@ -30,10 +30,4 @@ services:
       dockerfile: Dockerfile.react
     ports:
       - "3000:3000"
-    environment:
-      - REACT_APP_API_URL=http://107.23.132.119:7070
-    volumes:
-      - ./src:/app/src
-      - ./public:/app/public
-    depends_on:
-      - app
+    restart: always
