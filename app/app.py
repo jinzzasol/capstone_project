@@ -339,56 +339,72 @@ def logout():
 def dashboard():
 	return render_template('dashboard.html')
 
-@app.route('/api/submit-line', methods=['POST'])
-def handle_submit_line():
-    line = request.json.get('line', '')
-    app.logger.info(f"Received line: {line}")
-    
-
-    if line is not None:
-        app.logger.info(f"Line is not none: {line}")
-        session['msg']=add_line_of_code(line)
-        app.logger.info(f"Processed line, sending response: ", session['msg'])
-    # Process the code here, for example, analyze it and generate suggestions
-
-    # Return the suggestions as part of the response
-    return jsonify({
-        "message": "Line processed successfully",
-        "suggestions": session['msg']
-    })
-
-
-# @app.route('/ask', methods=['POST'])
-# def ask():
-#     data = request.json
-#     code_snippet = data['code']
-#     try:
-#         response = openai.Completion.create(
-#             engine="text-davinci-003",
-#             prompt=code_snippet,
-#             temperature=0.7,
-#             max_tokens=150,
-#             top_p=1.0,
-#             frequency_penalty=0.0,
-#             presence_penalty=0.0
-#         )
-#         return jsonify({'response': response.choices[0].text.strip()})
-#     except Exception as e:
-#         return jsonify({'error': str(e)})
+@app.before_request
+def before_request():
+    if 'current_code_context' not in session:
+        session['current_code_context'] = ''
+    if 'current_question' not in session:
+        session['current_question'] = None
 
 def add_line_of_code(new_line):
-    session['current_code_context'] += f"\n{new_line}"
-    app.logger.info("The current code context after adding new line: " + session['current_code_context'])
-    return parse_code_real_time(new_line)
+    try:
+        if 'current_code_context' not in session:
+            session['current_code_context'] = new_line
+        else:
+            session['current_code_context'] += f"\n{new_line}"
+        return "Line added successfully"
+    except Exception as e:
+        app.logger.error(f"Error adding line: {str(e)}")
+        return f"Error adding line: {str(e)}"
 
-def generate_optimization_prompt(code_snippet):
-    return [{
-        "role": "system",
-        "content" : "Given the provided Python code block, which represents a specific functionality within a larger program, conduct a detailed analysis focused on identifying inefficiencies, potential areas for improvement in readability and performance, and the appropriateness of the chosen data structures. Consider the impact of these structures on both the time and space complexity of the algorithm, and their alignment with Python best practices, including adherence to PEP 8 guidelines. For each identified area of improvement, particularly concerning the optimization of data structures, provide your feedback in a structured manner: 1) LINE NUMBER(S): Clearly specify the line number(s) that your feedback addresses. If the code block is short or the line numbers are not apparent, refer to the part of the code in question by its logical sequence or functionality. 2) SUGGESTION: Offer a concise recommendation for enhancing the code. Focus on suggesting alternative data structures that could lead to increased efficiency or clarity, where applicable. 3) REASON: Explain the logic behind your suggestion. Highlight the benefits, such as lower time complexity, better space efficiency, or closer alignment with Python best practices. 4) CODE SNIPPET: Provide a brief code example that illustrates your proposed change, particularly demonstrating how an alternative data structure could be implemented. This example should be directly related to the suggestion and must not extend or complete the original code. Ensure your feedback is directly relevant to the provided code block, acknowledging its intended function within a larger application context. Your objective is to offer specific, actionable suggestions that not only improve the current code but also impart broader programming insights where relevant. Avoid extending the code or introducing new functionality not present in the original snippet."
-        }, {
-        "role": "user",
-        "content": f"```python\n{code_snippet}\n```"
-    }]
+@app.route('/api/submit-line', methods=['POST'])
+def handle_submit_line():
+    try:
+        data = request.get_json()
+        line = data.get('line', '')
+        if not line:
+            return jsonify({"error": "No line provided"}), 400
+        
+        msg = add_line_of_code(line)
+        return jsonify({"message": msg, "code_context": session.get('current_code_context', '')}), 200
+    except Exception as e:
+        app.logger.error(f"Error in handle_submit_line: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+#     thread = Thread(target=threaded_code_analysis, args=(code_segment,))
+#     thread.start()
+
+# def threaded_code_analysis(code_segment):
+#     try:
+#         current_app.logger.info("Thread started")
+#         suggestions = analyze_code_segment(code_segment)
+#         grouped_feedback_items = extract_and_group_feedback_corrected(suggestions)
+#         current_app.logger.info("Analysis completed: %s", grouped_feedback_items)
+#     except Exception as e:
+#         current_app.logger.error("Error in thread: %s", str(e))
+
+
+def parse_code_real_time(new_line):
+    current_indent_level = len(new_line) - len(new_line.lstrip())
+    block_ending_keywords = ['return', 'break', 'continue', 'pass', 'raise']
+    app.logger.info("last_indent_level " + str(session['last_indent_level']))
+
+    if (any(keyword in new_line for keyword in block_ending_keywords) or current_indent_level < session['last_indent_level']) and session['current_code_context'].strip() != "":
+        try:
+            wrapped_code = wrap_code_block(session['current_code_context'])
+            tree = ast.parse(wrapped_code)
+            for node in ast.walk(tree):
+                if isinstance(node, ast.FunctionDef):
+                    app.logger.info("***********************************************************************************************")
+                    app.logger.info("sending code...................")
+                    return on_code_segment_completed(ast.unparse(node))
+                    #current_code_context = ""
+        except SyntaxError as e:
+            app.logger.info(f"Syntax Error: {e}")
+        finally:
+            session['last_indent_level'] = 0
+    else:         
+        session['last_indent_level'] = current_indent_level
 
 
 def wrap_code_block(code_snippet):
@@ -504,27 +520,14 @@ def on_code_segment_completed(code_segment):
 #         current_app.logger.error("Error in thread: %s", str(e))
 
 
-def parse_code_real_time(new_line):
-    current_indent_level = len(new_line) - len(new_line.lstrip())
-    block_ending_keywords = ['return', 'break', 'continue', 'pass', 'raise']
-    app.logger.info("last_indent_level " + str(session['last_indent_level']))
-
-    if (any(keyword in new_line for keyword in block_ending_keywords) or current_indent_level < session['last_indent_level']) and session['current_code_context'].strip() != "":
-        try:
-            wrapped_code = wrap_code_block(session['current_code_context'])
-            tree = ast.parse(wrapped_code)
-            for node in ast.walk(tree):
-                if isinstance(node, ast.FunctionDef):
-                    app.logger.info("***********************************************************************************************")
-                    app.logger.info("sending code...................")
-                    return on_code_segment_completed(ast.unparse(node))
-                    #current_code_context = ""
-        except SyntaxError as e:
-            app.logger.info(f"Syntax Error: {e}")
-        finally:
-            session['last_indent_level'] = 0
-    else:         
-        session['last_indent_level'] = current_indent_level
+def generate_optimization_prompt(code_snippet):
+    return [{
+        "role": "system",
+        "content" : "Given the provided Python code block, which represents a specific functionality within a larger program, conduct a detailed analysis focused on identifying inefficiencies, potential areas for improvement in readability and performance, and the appropriateness of the chosen data structures. Consider the impact of these structures on both the time and space complexity of the algorithm, and their alignment with Python best practices, including adherence to PEP 8 guidelines. For each identified area of improvement, particularly concerning the optimization of data structures, provide your feedback in a structured manner: 1) LINE NUMBER(S): Clearly specify the line number(s) that your feedback addresses. If the code block is short or the line numbers are not apparent, refer to the part of the code in question by its logical sequence or functionality. 2) SUGGESTION: Offer a concise recommendation for enhancing the code. Focus on suggesting alternative data structures that could lead to increased efficiency or clarity, where applicable. 3) REASON: Explain the logic behind your suggestion. Highlight the benefits, such as lower time complexity, better space efficiency, or closer alignment with Python best practices. 4) CODE SNIPPET: Provide a brief code example that illustrates your proposed change, particularly demonstrating how an alternative data structure could be implemented. This example should be directly related to the suggestion and must not extend or complete the original code. Ensure your feedback is directly relevant to the provided code block, acknowledging its intended function within a larger application context. Your objective is to offer specific, actionable suggestions that not only improve the current code but also impart broader programming insights where relevant. Avoid extending the code or introducing new functionality not present in the original snippet."
+        }, {
+        "role": "user",
+        "content": f"```python\n{code_snippet}\n```"
+    }]
 
 
 if __name__ == '__main__':
