@@ -282,8 +282,8 @@ questions = [
 
 @app.route('/api/questions/<int:index>', methods=['GET'])
 def get_question(index):
-    session['current_code_context']=""
-    session['msg']=""
+    session['current_code_context'] = ""
+    session['msg'] = ""
     session['last_indent_level'] = 0
     app.logger.info("hello %s %d", session['current_code_context'], session['last_indent_level'])
     # Validate index
@@ -307,7 +307,7 @@ def handle_submit():
     question = next((q for q in questions if q["id"] == questionId), None)
     if question is not None:
             description = question["description"]
-            msg=parse_code_real_time(code)
+            msg = parse_code_real_time(code)
             app.logger.info(msg)
 
     # Process the code here, for example, analyze it and generate suggestions
@@ -344,40 +344,25 @@ def handle_submit_line():
     line = request.json.get('line', '')
     app.logger.info(f"Received line: {line}")
     
-
     if line is not None:
         app.logger.info(f"Line is not none: {line}")
-        session['msg']=add_line_of_code(line)
-        app.logger.info(f"Processed line, sending response: ", session['msg'])
-    # Process the code here, for example, analyze it and generate suggestions
+        if 'current_code_context' not in session:
+            session['current_code_context'] = ''
+        if 'last_indent_level' not in session:
+            session['last_indent_level'] = 0
+        session['msg'] = add_line_of_code(line)
+        app.logger.info(f"Processed line, sending response: {session['msg']}")
 
-    # Return the suggestions as part of the response
     return jsonify({
         "message": "Line processed successfully",
-        "suggestions": session['msg']
+        "suggestions": session.get('msg', '')
     })
 
-
-# @app.route('/ask', methods=['POST'])
-# def ask():
-#     data = request.json
-#     code_snippet = data['code']
-#     try:
-#         response = openai.Completion.create(
-#             engine="text-davinci-003",
-#             prompt=code_snippet,
-#             temperature=0.7,
-#             max_tokens=150,
-#             top_p=1.0,
-#             frequency_penalty=0.0,
-#             presence_penalty=0.0
-#         )
-#         return jsonify({'response': response.choices[0].text.strip()})
-#     except Exception as e:
-#         return jsonify({'error': str(e)})
-
 def add_line_of_code(new_line):
-    session['current_code_context'] += f"\n{new_line}"
+    if 'current_code_context' not in session:
+        session['current_code_context'] = new_line
+    else:
+        session['current_code_context'] += f"\n{new_line}"
     app.logger.info("The current code context after adding new line: " + session['current_code_context'])
     return parse_code_real_time(new_line)
 
