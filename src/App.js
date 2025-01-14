@@ -186,8 +186,13 @@ const handlePreviousSuggestion = () => {
       const response = await axios.post(submissionUrl, submissionData);
       console.log("Backend Response:", response.data);
 
-      // Assume the backend response contains suggestions in `response.data.suggestions`
-      setSuggestions(response.data.suggestions); // Use actual suggestions from the backend
+      // Ensure suggestions is always an array
+      const receivedSuggestions = response.data.suggestions || [];
+      const formattedSuggestions = Array.isArray(receivedSuggestions) 
+        ? receivedSuggestions 
+        : [{ id: 1, text: receivedSuggestions, feedback: null }];
+
+      setSuggestions(formattedSuggestions);
       setShowSuggestions(true);
     } catch (error) {
       console.error("Error from backend:", error);
@@ -196,27 +201,47 @@ const handlePreviousSuggestion = () => {
         text: "There was an error processing your request. Please try again later.",
         feedback: null
       }]);
-      setShowSuggestions(true); // Optionally, you might want to still show the suggestions box with the error message
+      setShowSuggestions(true);
     }
   };
 
   const handleCloseSuggestions = () => {
-    setShowSuggestions(false); 
+    setShowSuggestions(false);
+    setSuggestions([]); // Clear suggestions when closing
   };
-  //use effect for suggestion navigation
-  useEffect(() => {
-    if (suggestions.length > 0 && currentSuggestionIndex < suggestions.length) {
-      const activeSuggestion = suggestions[currentSuggestionIndex];
-      setTooltipText(activeSuggestion.suggestion);
 
-      const lineNum = parseLineNumbers(activeSuggestion['line numbers']);
+  // useEffect for suggestion navigation
+  useEffect(() => {
+    // Guard against null or undefined suggestions
+    if (!suggestions) {
+      setTooltipVisible(false);
+      return;
+    }
+
+    // Check if we have valid suggestions and a valid index
+    if (suggestions.length > 0 && currentSuggestionIndex >= 0 && currentSuggestionIndex < suggestions.length) {
+      const activeSuggestion = suggestions[currentSuggestionIndex];
+      
+      // Handle case where suggestion might be a string
+      const suggestionText = typeof activeSuggestion === 'string' 
+        ? activeSuggestion 
+        : activeSuggestion.text || activeSuggestion.suggestion || '';
+
+      setTooltipText(suggestionText);
+
+      // Handle line numbers safely
+      const lineNum = activeSuggestion['line numbers'] 
+        ? parseLineNumbers(activeSuggestion['line numbers']) 
+        : [];
+      
       setHighlightedLine(lineNum);
       setTooltipVisible(true);
+    } else {
+      setTooltipVisible(false);
     }
   }, [currentSuggestionIndex, suggestions]);
-
-
   
+
   return (
     <div className="App">
       <HeaderApp />
