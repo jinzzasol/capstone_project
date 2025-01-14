@@ -358,6 +358,16 @@ def handle_submit_line():
         "suggestions": session.get('msg', '')
     })
 
+@app.before_request
+def before_request():
+    # Initialize session variables if they don't exist
+    if 'current_code_context' not in session:
+        session['current_code_context'] = ''
+    if 'last_indent_level' not in session:
+        session['last_indent_level'] = 0
+    if 'msg' not in session:
+        session['msg'] = ''
+
 def add_line_of_code(new_line):
     if 'current_code_context' not in session:
         session['current_code_context'] = new_line
@@ -490,26 +500,32 @@ def on_code_segment_completed(code_segment):
 
 
 def parse_code_real_time(new_line):
-    current_indent_level = len(new_line) - len(new_line.lstrip())
-    block_ending_keywords = ['return', 'break', 'continue', 'pass', 'raise']
-    app.logger.info("last_indent_level " + str(session['last_indent_level']))
+    try:
+        current_indent_level = len(new_line) - len(new_line.lstrip())
+        block_ending_keywords = ['return', 'break', 'continue', 'pass', 'raise']
+        app.logger.info("last_indent_level " + str(session.get('last_indent_level', 0)))
 
-    if (any(keyword in new_line for keyword in block_ending_keywords) or current_indent_level < session['last_indent_level']) and session['current_code_context'].strip() != "":
-        try:
-            wrapped_code = wrap_code_block(session['current_code_context'])
-            tree = ast.parse(wrapped_code)
-            for node in ast.walk(tree):
-                if isinstance(node, ast.FunctionDef):
-                    app.logger.info("***********************************************************************************************")
-                    app.logger.info("sending code...................")
-                    return on_code_segment_completed(ast.unparse(node))
-                    #current_code_context = ""
-        except SyntaxError as e:
-            app.logger.info(f"Syntax Error: {e}")
-        finally:
-            session['last_indent_level'] = 0
-    else:         
-        session['last_indent_level'] = current_indent_level
+        if (any(keyword in new_line for keyword in block_ending_keywords) or 
+            current_indent_level < session.get('last_indent_level', 0)) and session['current_code_context'].strip() != "":
+            try:
+                wrapped_code = wrap_code_block(session['current_code_context'])
+                tree = ast.parse(wrapped_code)
+                for node in ast.walk(tree):
+                    if isinstance(node, ast.FunctionDef):
+                        app.logger.info("***********************************************************************************************")
+                        app.logger.info("sending code...................")
+                        return on_code_segment_completed(ast.unparse(node))
+            except SyntaxError as e:
+                app.logger.info(f"Syntax Error: {e}")
+                return f"Syntax Error: {e}"
+            finally:
+                session['last_indent_level'] = 0
+        else:         
+            session['last_indent_level'] = current_indent_level
+            return ""
+    except Exception as e:
+        app.logger.error(f"Error in parse_code_real_time: {str(e)}")
+        return f"Error: {str(e)}"
 
 
 if __name__ == '__main__':
