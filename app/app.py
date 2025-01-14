@@ -59,12 +59,12 @@ Session(app)
 @app.before_request
 def before_request():
     # Initialize session variables if they don't exist
-    if 'current_code_context' not in session:
-        session['current_code_context'] = ''
-    if 'last_indent_level' not in session:
-        session['last_indent_level'] = 0
-    if 'msg' not in session:
-        session['msg'] = ''
+    # if 'current_code_context' not in session:
+    #     session['current_code_context'] = ''
+    # if 'last_indent_level' not in session:
+    #     session['last_indent_level'] = 0
+    # if 'msg' not in session:
+    #     session['msg'] = ''
 
 @app.after_request
 def after_request(response):
