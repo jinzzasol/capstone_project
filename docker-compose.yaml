@@ -19,10 +19,9 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_USER: postgres
       POSTGRES_DB: ridesharedb
-      POSTGRES_PORT: 5432
-      FLASK_DEBUG: True
+      POSTGRES_PORT: "5432"
+      FLASK_DEBUG: "true"
     # links:
     #   - "db:database"
     volumes:
       - ./app:/app
-  
