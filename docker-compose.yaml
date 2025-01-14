@@ -1,29 +1,22 @@
+version: '3.8'
+
 services:
-  # db:
-  #   image: postgres:15-bullseye
-  #   ports:
-  #     - "5432:5432"
-  #   environment:
-  #     POSTGRES_USER: postgres
-  #     POSTGRES_PASSWORD: postgres
-  #     POSTGRES_DB: ridesharedb
-  #   volumes:
-  #     - ./database:/docker-entrypoint-initdb.d
-  #     - ./database/data:/var/lib/postgresql/data
   app:
-    build: ./app
+    build: 
+      context: ./app
+      dockerfile: Dockerfile
     ports:
       - "7070:7070"
     environment:
-      POSTGRES_HOST: db
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_USER: postgres
-      POSTGRES_DB: ridesharedb
-      POSTGRES_PORT: "5432"
-      FLASK_DEBUG: "true"
-      OPENAI_API_KEY: ${OPENAI_API_KEY}
-      FLASK_SECRET_KEY: ${FLASK_SECRET_KEY}
-    env_file:
-      - app/.env
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - FLASK_SECRET_KEY=${FLASK_SECRET_KEY}
+      - FLASK_DEBUG=true
+      - POSTGRES_HOST=db
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=ridesharedb
+      - POSTGRES_PORT=5432
     volumes:
-      - ./app:/app
+      - type: bind
+        source: ./app
+        target: /app
