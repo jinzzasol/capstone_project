@@ -35,7 +35,7 @@ $ pipenv install
 
 ### Run
 
-This will start flask server and at http://localhost:7070/
+This will start flask server and at http://52.91.5.78:7070/
 
 ```sh
 $ python app.py

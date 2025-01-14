@@ -12,7 +12,7 @@ function SuggestionsTab({ suggestions, onClose }) {
         setFeedbackStatus({ ...feedbackStatus, [id]: { loading: true } }); 
 
         try {
-          const response = await axios.post('http://localhost:7070/api/suggestions/feedback', { id, feedback });
+          const response = await axios.post('http://52.91.5.78:7070/api/suggestions/feedback', { id, feedback });
           console.log(`Feedback sent for suggestion ${id}: ${feedback}`);
           setFeedbackStatus({
             ...feedbackStatus,

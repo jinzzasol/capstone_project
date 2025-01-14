@@ -11,7 +11,7 @@ import questions from './data/questions';
 import SuggestionsTab from './components/SuggestionsTab'
 //import { sendCodeToBackend } from './lib/codeHandler'
 //import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-dom';
-axios.defaults.baseURL = 'http://localhost:7070';
+axios.defaults.baseURL = 'http://52.91.5.78:7070';
 axios.defaults.withCredentials = true;
 
 function App() {
@@ -33,7 +33,7 @@ function App() {
   
   // const sendLineToBackend = async (line, lineNumber) => {
   //   try {
-  //     const response = await axios.post('http://localhost:7070/api/submit-line', { line });
+  //     const response = await axios.post('http://52.91.5.78:7070/api/submit-line', { line });
       
   //     if (response.data) {
   //       console.log("Line submitted, response:", response.data);
@@ -66,7 +66,7 @@ function App() {
 const sendLineToBackend = async (line, lineNumber) => {
   try {
     console.log("fetching response")
-    const response = await axios.post('http://localhost:7070/api/submit-line', { line });
+    const response = await axios.post('http://52.91.5.78:7070/api/submit-line', { line });
     console.log("Full Response:", response);  
 
     if (response.data && response.data.suggestions) {
@@ -104,7 +104,7 @@ const updateTooltipBasedOnSuggestion = (suggestion) => {
   const fetchQuestionDetails = async () => {
     try {
       // Update the URL according to your API endpoint structure
-      const response = await axios.get(`http://localhost:7070/api/questions/${currentQuestionIndex}`);
+      const response = await axios.get(`http://52.91.5.78:7070/api/questions/${currentQuestionIndex}`);
       setQuestionDetails({
         title: response.data.title,
         description: response.data.description
@@ -165,7 +165,7 @@ const handlePreviousSuggestion = () => {
   const handleSubmit = async () => {
     const questionId = questions[currentQuestionIndex].id;
     const submissionId = generateRandomSubmissionId();
-    const submissionUrl = 'http://localhost:7070/api/submit-code'; // Your Flask backend endpoint for code submission
+    const submissionUrl = 'http://52.91.5.78:7070/api/submit-code'; // Your Flask backend endpoint for code submission
 
     console.log("Submitting Code:", code, "Question ID:", questionId, "Submission ID:", submissionId);
 
