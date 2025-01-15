@@ -245,55 +245,53 @@ function App() {
   return (
     <div className="App">
       <HeaderApp />
-      <div className="content">
-        <div className="description-box-container" style={{flex: isSuggestionsVisible ? '0.5' : '1'}}>
+      <div className="main-content">
+        <div className="question-section">
           <DescriptionBox
             title={questionDetails.title}
             description={questionDetails.description}
-            onPreviousClick={handlePreviousClick}
-            onNextClick={handleNextClick}
-            isFirst={currentQuestionIndex === 0}
-            isLast={currentQuestionIndex === questions.length - 1}
+            onPrevious={handlePreviousClick}
+            onNext={handleNextClick}
+            currentQuestion={currentQuestionIndex + 1}
+            totalQuestions={questions.length}
           />
         </div>
-        <div className="right-container">
-          <CodeTabs activeLanguage={activeLanguage} setActiveLanguage={setActiveLanguage} />
-          <div className="main-container">
-            <div className="code-editor-container" style={{flex: isSuggestionsVisible ? '0.5' : '1'}}>
+        <div className={`code-section ${showSuggestions ? 'with-suggestions' : ''}`}>
+          <CodeTabs
+            activeLanguage={activeLanguage}
+            onLanguageChange={setActiveLanguage}
+          />
+          <div className="code-editor">
             <CodeEditor
-  language={activeLanguage}
-  code={code}
-  setCode={setCode}
-  highlightedLine={highlightedLine}
-  tooltipText={tooltipText}
-  tooltipVisible={tooltipVisible}
-  setTooltipVisible={setTooltipVisible}
-  handleNextSuggestion={handleNextSuggestion}
-  handlePreviousSuggestion={handlePreviousSuggestion}
-  currentSuggestionIndex={currentSuggestionIndex}
-  suggestions={suggestions}
-  onNewLineAdded={sendLineToBackend}
-/>
-
-            </div>
+              language={activeLanguage}
+              code={code}
+              setCode={setCode}
+              onNewLineAdded={sendLineToBackend}
+              highlightedLine={highlightedLine}
+              tooltipText={tooltipText}
+              tooltipVisible={tooltipVisible}
+              setTooltipVisible={setTooltipVisible}
+              handleNextSuggestion={handleNextSuggestion}
+              handlePreviousSuggestion={handlePreviousSuggestion}
+              currentSuggestionIndex={currentSuggestionIndex}
+              suggestions={suggestions}
+            />
           </div>
-          {showSuggestions && (
-            <div className="lower-container">
-              <SuggestionsTab
-                suggestions={suggestions}
-                onClose={handleCloseSuggestions}
-                isLoading={isSubmitting}
-              />
-            </div>
-          )}
           <button 
-            className="submit-button" 
+            className="submit-button"
             onClick={handleSubmit}
-            style={{ position: 'absolute', right: '20px', bottom: '175px', padding: '10px 20px' }}
+            disabled={isSubmitting}
           >
-            {isSubmitting ? 'Submitting...' : 'Submit'}
+            {isSubmitting ? 'Analyzing...' : 'Submit'}
           </button>
         </div>
+        {showSuggestions && (
+          <SuggestionsTab
+            suggestions={suggestions}
+            onClose={handleCloseSuggestions}
+            isLoading={isSubmitting}
+          />
+        )}
       </div>
     </div>
   );

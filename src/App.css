@@ -1,43 +1,71 @@
 /* app.css */
 .App {
-  text-align: left;
+  text-align: center;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-
 }
-.content {
+
+.main-content {
   display: flex;
+  flex: 1;
+  height: calc(100vh - 60px); /* Adjust based on your header height */
+  position: relative;
 }
 
-  .right-container {
-    position: relative;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    box-sizing: border-box; 
-  }
-
-
-.left-container{
-  width: 50%;
+.question-section {
+  flex: 0 0 40%;
+  overflow-y: auto;
+  padding: 20px;
+  border-right: 1px solid #ccc;
 }
 
-.upper-container {
-  flex: 1; /* This will allow it to fill the space */
-  overflow: auto; /* In case content overflows */
+.code-section {
+  flex: 0 0 60%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
 }
 
-.lower-container {
-  flex: 1; /* Adjust this value based on how much space you want the suggestions to take */
-  overflow: auto; /* In case content overflows */
+/* Adjust code editor height when suggestions are shown */
+.code-section.with-suggestions {
+  height: calc(60vh - 60px); /* Adjust when suggestions are shown */
+}
+
+.code-editor {
+  flex: 1;
+  position: relative;
+}
+
+.submit-button {
+  position: absolute;
+  right: 20px;
+  bottom: 20px;
+  padding: 10px 20px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  z-index: 1000;
+}
+
+.submit-button:hover {
+  background-color: #45a049;
+}
+
+.submit-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
 }
 
 .App-logo {
   height: 40vmin;
   pointer-events: none;
 }
-
 
 .App-header {
   background-color: #282c34;
@@ -52,25 +80,4 @@
 
 .App-link {
   color: #61dafb;
-}
-
-.submit-button {
-  padding: 10px 20px; 
-  cursor: pointer;
-  background-color: #3491aa; 
-  color: white; 
-  border: none;
-  border-radius: 4px;
-  font-size: 16px; 
-  font-weight: bold; 
-  outline: none; 
-}
-
-.submit-button:hover {
-  background-color: #1e1e1e;
-}
-
-.submit-button:disabled {
-  background-color: #555;
-  cursor: not-allowed;
 }

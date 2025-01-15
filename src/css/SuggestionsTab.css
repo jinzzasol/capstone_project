@@ -1,27 +1,27 @@
 /* SuggestionsTab.css adjustments */
 .suggestions-container {
     position: fixed;
-    right: 0;
-    top: 0;
+    left: 0;
     bottom: 0;
-    width: 400px;
+    width: 100%;
+    height: 40vh; /* Take 40% of viewport height */
     background-color: #2d2d2d;
     color: #ffffff;
     padding: 20px;
-    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
     z-index: 1000;
-    overflow-y: auto;
     transition: transform 0.3s ease;
 }
 
 .suggestions-container.hide {
-    transform: translateX(100%);
+    transform: translateY(100%);
 }
 
 .suggestions-content {
-    height: 100%;
+    height: calc(100% - 40px); /* Account for padding */
     overflow-y: auto;
     padding-right: 10px;
+    margin-top: 10px;
 }
 
 .suggestion-item {
@@ -29,17 +29,19 @@
     border-radius: 8px;
     margin-bottom: 15px;
     padding: 15px;
+    max-width: 100%;
 }
 
 .suggestion-text {
     font-family: 'Consolas', 'Monaco', monospace;
     white-space: pre-wrap;
     word-wrap: break-word;
-    max-width: 100%;
     margin-bottom: 10px;
     line-height: 1.5;
     font-size: 14px;
     color: #e6e6e6;
+    overflow-x: auto;
+    max-width: 100%;
 }
 
 .feedback-buttons {
@@ -64,14 +66,15 @@
 
 .close-btn {
     position: absolute;
-    right: 10px;
-    top: 10px;
+    right: 20px;
+    top: 20px;
     padding: 8px 15px;
     border: none;
     border-radius: 4px;
     background-color: #4a4a4a;
     color: white;
     cursor: pointer;
+    z-index: 1;
 }
 
 .close-btn:hover {
@@ -84,7 +87,8 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 200px;
+    height: 100%;
+    padding: 20px;
 }
 
 .loading-spinner {
@@ -106,6 +110,25 @@
     color: #e6e6e6;
     font-size: 16px;
     margin: 0;
+}
+
+/* Custom scrollbar for better visibility */
+.suggestions-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.suggestions-content::-webkit-scrollbar-track {
+    background: #2d2d2d;
+    border-radius: 4px;
+}
+
+.suggestions-content::-webkit-scrollbar-thumb {
+    background: #4a4a4a;
+    border-radius: 4px;
+}
+
+.suggestions-content::-webkit-scrollbar-thumb:hover {
+    background: #5a5a5a;
 }
 
 /* Example using flexbox for the main layout */
