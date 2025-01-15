@@ -259,34 +259,16 @@ def authorize():
 questions = [
     {
         "id": 1,
-        "title": "1. Add Two Numbers",
-        "description": "<p>You are given two non-empty linked lists representing two non-negative integers. The digits are stored in reverse order, and each of their nodes contains a single digit. Add the two numbers and return the sum as a linked list. You may assume the two numbers do not contain any leading zero, except the number 0 itself.</p><p><strong>Example 1:</strong><br />Input: l1 = [2,4,3], l2 = [5,6,4]<br />Output: [7,0,8]<br />Explanation: 342 + 465 = 807.</p><p><strong>Example 2:</strong><br />Input: l1 = [0], l2 = [0]<br />Output: [0]</p><p><strong>Example 3:</strong><br />Input: l1 = [9,9,9,9,9,9,9], l2 = [9,9,9,9]<br />Output: [8,9,9,9,0,0,0,1]</p>",
-        "starterCode": "# Write your Python code here"
+        "title": "Basic Function",
+        "description": "Write a function that adds two numbers",
+        "starterCode": "def add_numbers(a, b):\n    # Your code here\n    pass"
     },
     {
         "id": 2,
-        "title": "2. Two Sum",
-        "description": "<p>Given an array of integers <code>nums</code> and an integer <code>target</code>, return indices of the two numbers such that they add up to <code>target</code>.</p><p>You may assume that each input would have <strong>exactly one solution</strong>, and you may not use the same element twice.</p><p>You can return the answer in any order.</p><p><strong>Example 1:</strong><br />Input: nums = [2,7,11,15], target = 9<br />Output: [0,1]<br />Output: Because nums[0] + nums[1] == 9, we return [0, 1].</p>",
-        "starterCode": "# Write your Python code here"
-    },
-    {
-        "id": 3,
-        "title": "3. Longest Substring Without Repeating Characters",
-        "description": "<p>Given a string <code>s</code>, find the length of the <strong>longest substring</strong> without repeating characters.</p><p><strong>Example 1:</strong><br />Input: s = \"abcabcbb\"<br />Output: 3<br />Explanation: The answer is \"abc\", with the length of 3.</p><p><strong>Example 2:</strong><br />Input: s = \"bbbbb\"<br />Output: 1<br />Explanation: The answer is \"b\", with the length of 1.</p>",
-        "starterCode": "# Write your Python code here"
-    },
-    {
-        "id": 4,
-        "title": "4. Median of Two Sorted Arrays",
-        "description": "<p>Given two sorted arrays <code>nums1</code> and <code>nums2</code> of size <code>m</code> and <code>n</code> respectively, return the <strong>median</strong> of the two sorted arrays.</p><p>The overall run time complexity should be <code>O(log (m+n))</code>.</p><p><strong>Example 1:</strong><br />Input: nums1 = [1,3], nums2 = [2]<br />Output: 2.00000<br />Explanation: merged array = [1,2,3] and median is 2.</p><p><strong>Example 2:</strong><br />Input: nums1 = [1,2], nums2 = [3,4]<br />Output: 2.50000<br />Explanation: merged array = [1,2,3,4] and median is (2 + 3) / 2 = 2.5.</p>",
-        "starterCode": "# Write your Python code here"
-    },
-    {
-        "id": 5,
-        "title": "5. Longest Palindromic Substring",
-        "description": "<p>Given a string <code>s</code>, return the <strong>longest palindromic substring</strong> in <code>s</code>.</p><p><strong>Example 1:</strong><br />Input: s = \"babad\"<br />Output: \"bab\"<br />Note: \"aba\" is also a valid answer.</p><p><strong>"
-	},
-    # Add other questions similarly
+        "title": "List Manipulation",
+        "description": "Write a function that reverses a list",
+        "starterCode": "def reverse_list(lst):\n    # Your code here\n    pass"
+    }
 ]
 
 @app.route('/api/questions/<int:index>', methods=['GET'])
@@ -307,25 +289,54 @@ def get_question(index):
         # Add or remove fields as necessary
         'starterCode': question.get('starterCode', '')
     })
+
 @app.route('/api/submit-code', methods=['POST'])
 def handle_submit():
-    data = request.json
-    code = data.get('code')
-    questionId = data.get('questionId')
-    submissionId = data.get('submissionId')
-    question = next((q for q in questions if q["id"] == questionId), None)
-    if question is not None:
-            description = question["description"]
-            msg=parse_code_real_time(code)
-            app.logger.info(msg)
+    try:
+        data = request.json
+        if not data:
+            return jsonify({"error": "No data provided"}), 400
 
-    # Process the code here, for example, analyze it and generate suggestions
+        code = data.get('code')
+        questionId = data.get('questionId')
+        submissionId = data.get('submissionId')
 
-    suggestions = [{'id': 1, 'text': msg, 'feedback': "Consider using a list comprehension."}]
+        if not all([code, questionId, submissionId]):
+            return jsonify({"error": "Missing required fields"}), 400
 
-    # Return the suggestions as part of the response
-    return jsonify({"message": "Submission received successfully", "submissionId": submissionId, "suggestions": msg})
+        # Initialize session variables if they don't exist
+        if 'current_code_context' not in session:
+            session['current_code_context'] = ""
+        if 'last_indent_level' not in session:
+            session['last_indent_level'] = 0
 
+        # Find the question
+        question = next((q for q in questions if q["id"] == questionId), None)
+        if question is None:
+            return jsonify({"error": "Question not found"}), 404
+
+        # Process the code
+        try:
+            msg = parse_code_real_time(code)
+            if not msg:
+                msg = "No suggestions available for this code."
+            app.logger.info(f"Code analysis result: {msg}")
+        except Exception as e:
+            app.logger.error(f"Error analyzing code: {str(e)}")
+            msg = "Error analyzing code. Please try again."
+
+        # Format the response
+        suggestions = [{'id': 1, 'text': msg, 'feedback': None}] if isinstance(msg, str) else msg
+
+        return jsonify({
+            "message": "Submission received successfully",
+            "submissionId": submissionId,
+            "suggestions": suggestions
+        })
+
+    except Exception as e:
+        app.logger.error(f"Error in handle_submit: {str(e)}")
+        return jsonify({"error": "Internal server error"}), 500
 
 @app.route('/api/suggestions/feedback', methods=['POST'])
 def handle_feedback():
@@ -334,7 +345,6 @@ def handle_feedback():
     questionId = data.get('id')
 
     return jsonify({"message": "Feedback recived successfully"})
-
 
 @app.route('/logout')
 @is_logged_in
@@ -365,25 +375,6 @@ def handle_submit_line():
         "message": "Line processed successfully",
         "suggestions": session['msg']
     })
-
-
-# @app.route('/ask', methods=['POST'])
-# def ask():
-#     data = request.json
-#     code_snippet = data['code']
-#     try:
-#         response = openai.Completion.create(
-#             engine="text-davinci-003",
-#             prompt=code_snippet,
-#             temperature=0.7,
-#             max_tokens=150,
-#             top_p=1.0,
-#             frequency_penalty=0.0,
-#             presence_penalty=0.0
-#         )
-#         return jsonify({'response': response.choices[0].text.strip()})
-#     except Exception as e:
-#         return jsonify({'error': str(e)})
 
 def add_line_of_code(new_line):
     session['current_code_context'] += f"\n{new_line}"
@@ -514,33 +505,41 @@ def on_code_segment_completed(code_segment):
 
 
 def parse_code_real_time(new_line):
-    current_indent_level = len(new_line) - len(new_line.lstrip())
-    block_ending_keywords = ['return', 'break', 'continue', 'pass', 'raise']
-    app.logger.info("last_indent_level " + str(session['last_indent_level']))
-
-    if (any(keyword in new_line for keyword in block_ending_keywords) or current_indent_level < session['last_indent_level']) and session['current_code_context'].strip() != "":
-        try:
-            wrapped_code = wrap_code_block(session['current_code_context'])
-            tree = ast.parse(wrapped_code)
-            for node in ast.walk(tree):
-                if isinstance(node, ast.FunctionDef):
-                    app.logger.info("***********************************************************************************************")
-                    app.logger.info("sending code...................")
-                    return on_code_segment_completed(ast.unparse(node))
-                    #current_code_context = ""
-        except SyntaxError as e:
-            app.logger.info(f"Syntax Error: {e}")
-        finally:
+    try:
+        current_indent_level = len(new_line) - len(new_line.lstrip())
+        block_ending_keywords = ['return', 'break', 'continue', 'pass', 'raise']
+        
+        if 'last_indent_level' not in session:
             session['last_indent_level'] = 0
-    else:         
-        session['last_indent_level'] = current_indent_level
+        if 'current_code_context' not in session:
+            session['current_code_context'] = ""
 
+        app.logger.info(f"Processing code with indent level: {current_indent_level}")
+
+        if (any(keyword in new_line for keyword in block_ending_keywords) or 
+            current_indent_level < session['last_indent_level']) and session['current_code_context'].strip():
+            try:
+                wrapped_code = wrap_code_block(session['current_code_context'])
+                tree = ast.parse(wrapped_code)
+                for node in ast.walk(tree):
+                    if isinstance(node, ast.FunctionDef):
+                        app.logger.info("Found function definition")
+                        return optimize_code_with_chatgpt(ast.unparse(node))
+            except Exception as e:
+                app.logger.error(f"Error parsing code block: {str(e)}")
+                return f"Could not analyze code: {str(e)}"
+
+        # Update session variables
+        session['current_code_context'] += new_line + "\n"
+        session['last_indent_level'] = current_indent_level
+        
+        return "Code received and being analyzed..."
+
+    except Exception as e:
+        app.logger.error(f"Error in parse_code_real_time: {str(e)}")
+        return f"Error processing code: {str(e)}"
 
 if __name__ == '__main__':
 	app.secret_key = os.getenv('FLASK_SECRET_KEY', 'your-default-secret-key')
 	port = int(os.environ.get("PORT",7070))
 	app.run(host='0.0.0.0', port=port,use_reloader=True)
-
-     
-    
-    

@@ -2,23 +2,39 @@ version: '3.8'
 
 services:
   app:
-    build: 
+    build:
       context: ./app
       dockerfile: Dockerfile
     ports:
       - "7070:7070"
     environment:
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - FLASK_SECRET_KEY=${FLASK_SECRET_KEY}
       - FLASK_APP=app.py
       - FLASK_ENV=production
-      - PYTHONUNBUFFERED=1
-      - GUNICORN_WORKERS=4
-      - GUNICORN_TIMEOUT=120
-      - CORS_ORIGINS=http://52.91.5.78:3000,http://localhost:3000
+      - FLASK_DEBUG=0
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - FLASK_SECRET_KEY=${FLASK_SECRET_KEY}
+    volumes:
+      - ./app:/app
+      - /sessions:/sessions
     restart: unless-stopped
     logging:
       driver: "json-file"
       options:
         max-size: "10m"
         max-file: "3"
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.react
+    ports:
+      - "3000:80"
+    depends_on:
+      - app
+    environment:
+      - NODE_ENV=production
+      - REACT_APP_API_URL=http://52.91.5.78:7070
+
+networks:
+  default:
+    driver: bridge
