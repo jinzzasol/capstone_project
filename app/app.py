@@ -259,18 +259,232 @@ def authorize():
 questions = [
     {
         "id": 1,
-        "title": "Basic Function",
-        "description": "Write a function that adds two numbers",
-        "starterCode": "def add_numbers(a, b):\n    # Your code here\n    pass"
+        "title": "Sum of Two Numbers",
+        "description": """Write a function that adds two numbers and returns their sum.
+
+Examples:
+- add_numbers(5, 3) → 8
+- add_numbers(-1, 1) → 0
+- add_numbers(0.5, 1.5) → 2.0
+
+Test Cases:
+1. Positive numbers: add_numbers(10, 20) should return 30
+2. Negative numbers: add_numbers(-5, -7) should return -12
+3. Mixed numbers: add_numbers(-3, 8) should return 5
+4. Zero: add_numbers(0, 5) should return 5
+5. Floating points: add_numbers(0.1, 0.2) should return 0.3
+
+Note: Make sure to handle both integer and floating-point numbers.""",
+        "starterCode": """def add_numbers(a, b):
+    # Your code here
+    pass"""
     },
     {
         "id": 2,
-        "title": "List Manipulation",
-        "description": "Write a function that reverses a list",
-        "starterCode": "def reverse_list(lst):\n    # Your code here\n    pass"
+        "title": "Reverse a List",
+        "description": """Write a function that reverses a list without using the built-in reverse() method.
+
+Examples:
+- reverse_list([1, 2, 3]) → [3, 2, 1]
+- reverse_list(['a', 'b', 'c']) → ['c', 'b', 'a']
+- reverse_list([]) → []
+
+Test Cases:
+1. Normal list: reverse_list([1, 2, 3, 4, 5])
+2. List with duplicates: reverse_list([1, 1, 2, 2, 3])
+3. Empty list: reverse_list([])
+4. Single element: reverse_list([1])
+5. Mixed types: reverse_list([1, 'a', True])
+
+Note: Try to solve it with O(n) time complexity and O(1) space complexity.""",
+        "starterCode": """def reverse_list(lst):
+    # Your code here
+    pass"""
+    },
+    {
+        "id": 3,
+        "title": "Find Prime Numbers",
+        "description": """Write a function that returns all prime numbers up to a given number n.
+
+Examples:
+- get_primes(10) → [2, 3, 5, 7]
+- get_primes(20) → [2, 3, 5, 7, 11, 13, 17, 19]
+- get_primes(0) → []
+
+Test Cases:
+1. Normal case: get_primes(30)
+2. Small number: get_primes(5)
+3. Zero or negative: get_primes(0)
+4. Large number: get_primes(100)
+5. Edge case: get_primes(2)
+
+Note: Try to optimize your solution using the Sieve of Eratosthenes algorithm.""",
+        "starterCode": """def get_primes(n):
+    # Your code here
+    pass"""
+    },
+    {
+        "id": 4,
+        "title": "Palindrome Check",
+        "description": """Write a function that checks if a given string is a palindrome. A palindrome reads the same backwards as forwards.
+
+Examples:
+- is_palindrome("racecar") → True
+- is_palindrome("hello") → False
+- is_palindrome("A man a plan a canal Panama") → True
+
+Test Cases:
+1. Simple palindrome: is_palindrome("level")
+2. Case sensitivity: is_palindrome("Level")
+3. Spaces and punctuation: is_palindrome("A man, a plan, a canal: Panama")
+4. Empty string: is_palindrome("")
+5. Single character: is_palindrome("a")
+
+Note: 
+- Ignore case sensitivity
+- Remove all non-alphanumeric characters
+- Empty strings are considered palindromes""",
+        "starterCode": """def is_palindrome(text):
+    # Your code here
+    pass"""
+    },
+    {
+        "id": 5,
+        "title": "Fibonacci Sequence",
+        "description": """Write a function that returns the nth number in the Fibonacci sequence. The Fibonacci sequence starts with 0, 1, and each subsequent number is the sum of the previous two.
+
+Examples:
+- fibonacci(0) → 0
+- fibonacci(1) → 1
+- fibonacci(6) → 8 (sequence: 0, 1, 1, 2, 3, 5, 8)
+
+Test Cases:
+1. First number: fibonacci(0)
+2. Second number: fibonacci(1)
+3. Normal case: fibonacci(7)
+4. Large number: fibonacci(10)
+5. Edge case: fibonacci(2)
+
+Note: Try to implement both recursive and iterative solutions. Consider which is more efficient for large values of n.""",
+        "starterCode": """def fibonacci(n):
+    # Your code here
+    pass"""
+    },
+    {
+        "id": 6,
+        "title": "Anagram Check",
+        "description": """Write a function that determines if two strings are anagrams. An anagram is a word formed by rearranging the letters of another word.
+
+Examples:
+- are_anagrams("listen", "silent") → True
+- are_anagrams("hello", "world") → False
+- are_anagrams("debit card", "bad credit") → True
+
+Test Cases:
+1. Simple anagrams: are_anagrams("triangle", "integral")
+2. Different lengths: are_anagrams("hello", "world")
+3. Same letters: are_anagrams("aaaa", "aaaa")
+4. Case sensitivity: are_anagrams("Tea", "Eat")
+5. Spaces and punctuation: are_anagrams("debit card", "bad credit")
+
+Note: 
+- Ignore case sensitivity
+- Ignore spaces and punctuation
+- Consider using a dictionary to count characters""",
+        "starterCode": """def are_anagrams(str1, str2):
+    # Your code here
+    pass"""
+    },
+    {
+        "id": 7,
+        "title": "Binary Search",
+        "description": """Implement a binary search function that returns the index of a target element in a sorted array. Return -1 if the element is not found.
+
+Examples:
+- binary_search([1, 2, 3, 4, 5], 3) → 2
+- binary_search([1, 2, 3, 4, 5], 6) → -1
+- binary_search([], 1) → -1
+
+Test Cases:
+1. Element exists: binary_search([1, 3, 5, 7, 9, 11], 7)
+2. Element doesn't exist: binary_search([1, 3, 5, 7, 9], 4)
+3. Empty array: binary_search([], 5)
+4. Single element: binary_search([1], 1)
+5. Duplicate elements: binary_search([1, 2, 2, 2, 3], 2)
+
+Note: Binary search requires the array to be sorted. Time complexity should be O(log n).""",
+        "starterCode": """def binary_search(arr, target):
+    # Your code here
+    pass"""
+    },
+    {
+        "id": 8,
+        "title": "Find Missing Number",
+        "description": """Write a function that finds the missing number in an array containing n distinct numbers taken from 0 to n.
+
+Examples:
+- find_missing([3, 0, 1]) → 2
+- find_missing([9,6,4,2,3,5,7,0,1]) → 8
+- find_missing([0]) → 1
+
+Test Cases:
+1. Normal case: find_missing([0, 1, 3])
+2. Larger sequence: find_missing([0, 1, 2, 4, 5, 6])
+3. Missing first: find_missing([1, 2, 3])
+4. Missing last: find_missing([0, 1, 2])
+5. Single element: find_missing([0])
+
+Note: Try to solve it without using extra space. Consider using the sum formula n * (n+1) / 2.""",
+        "starterCode": """def find_missing(nums):
+    # Your code here
+    pass"""
+    },
+    {
+        "id": 9,
+        "title": "Valid Parentheses",
+        "description": """Write a function that determines if a string of parentheses is valid. Opening brackets must be closed by the same type of closing brackets in the correct order.
+
+Examples:
+- is_valid("()") → True
+- is_valid("()[]{}") → True
+- is_valid("(]") → False
+- is_valid("([)]") → False
+
+Test Cases:
+1. Simple case: is_valid("()")
+2. Multiple types: is_valid("()[]{}")
+3. Nested brackets: is_valid("{[()]}")
+4. Invalid closing: is_valid("([)]")
+5. Unmatched: is_valid("((")
+
+Note: Consider using a stack data structure to solve this problem.""",
+        "starterCode": """def is_valid(s):
+    # Your code here
+    pass"""
+    },
+    {
+        "id": 10,
+        "title": "Merge Sorted Arrays",
+        "description": """Write a function that merges two sorted arrays into a single sorted array.
+
+Examples:
+- merge_arrays([1, 3, 5], [2, 4, 6]) → [1, 2, 3, 4, 5, 6]
+- merge_arrays([1], []) → [1]
+- merge_arrays([], [1]) → [1]
+
+Test Cases:
+1. Normal merge: merge_arrays([1, 3, 5], [2, 4, 6])
+2. Arrays with duplicates: merge_arrays([1, 2, 3], [2, 3, 4])
+3. Empty arrays: merge_arrays([], [])
+4. One empty array: merge_arrays([1, 2], [])
+5. Different lengths: merge_arrays([1], [2, 3, 4])
+
+Note: Try to solve it with O(n+m) time complexity where n and m are the lengths of the input arrays.""",
+        "starterCode": """def merge_arrays(arr1, arr2):
+    # Your code here
+    pass"""
     }
 ]
-
 @app.route('/api/questions/<int:index>', methods=['GET'])
 def get_question(index):
     session['current_code_context']=""
