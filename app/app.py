@@ -360,11 +360,16 @@ Please analyze this code submission for:
         analysis = response.choices[0].message.content
         app.logger.info(f"Code analysis: {analysis}")
         
+        # Clear any existing line-by-line suggestions from session
+        session['current_code_context'] = ""
+        session['last_indent_level'] = 0
+        session['msg'] = ""
+        
         return jsonify({
             "message": "Submission received successfully",
             "submissionId": submissionId,
             "suggestions": analysis,
-            "clearTooltips": True  # Add flag to clear tooltips
+            "clearTooltips": True
         })
         
     except Exception as e:
