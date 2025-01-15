@@ -307,25 +307,66 @@ def get_question(index):
         # Add or remove fields as necessary
         'starterCode': question.get('starterCode', '')
     })
+
 @app.route('/api/submit-code', methods=['POST'])
 def handle_submit():
     data = request.json
     code = data.get('code')
     questionId = data.get('questionId')
     submissionId = data.get('submissionId')
+    
+    # Find the question
     question = next((q for q in questions if q["id"] == questionId), None)
-    if question is not None:
-            description = question["description"]
-            msg=parse_code_real_time(code)
-            app.logger.info(msg)
+    if question is None:
+        return jsonify({"error": "Question not found"}), 404
+        
+    # Generate analysis prompt with question context
+    prompt = f"""Question Description:
+{question['description']}
 
-    # Process the code here, for example, analyze it and generate suggestions
+Submitted Code:
+{code}
 
-    suggestions = [{'id': 1, 'text': msg, 'feedback': "Consider using a list comprehension."}]
+Please analyze this code submission for:
+1. Correctness - Does it solve the given problem?
+2. Efficiency - Time and space complexity analysis
+3. Code style and best practices
+4. Potential improvements and optimizations
+5. Edge cases handling"""
 
-    # Return the suggestions as part of the response
-    return jsonify({"message": "Submission received successfully", "submissionId": submissionId, "suggestions": msg})
-
+    try:
+        # Get analysis from GPT
+        messages = [{
+            "role": "system",
+            "content": "You are a code review expert. Analyze the submitted code in relation to the given problem description."
+        }, {
+            "role": "user",
+            "content": prompt
+        }]
+        
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=messages,
+            temperature=0.4,
+            max_tokens=1000,
+            top_p=0.7
+        )
+        
+        analysis = response.choices[0].message.content
+        app.logger.info(f"Code analysis: {analysis}")
+        
+        return jsonify({
+            "message": "Submission received successfully",
+            "submissionId": submissionId,
+            "suggestions": analysis
+        })
+        
+    except Exception as e:
+        app.logger.error(f"Error analyzing code: {str(e)}")
+        return jsonify({
+            "error": "Error analyzing code submission",
+            "details": str(e)
+        }), 500
 
 @app.route('/api/suggestions/feedback', methods=['POST'])
 def handle_feedback():
