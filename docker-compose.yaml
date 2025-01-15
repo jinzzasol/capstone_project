@@ -48,24 +48,6 @@ services:
     environment:
       - NODE_ENV=production
       - REACT_APP_API_URL=http://52.91.5.78:7070
-      - WATCHPACK_POLLING=true
     restart: always
-    deploy:
-      resources:
-        limits:
-          cpus: '0.5'
-          memory: 512M
-        reservations:
-          cpus: '0.25'
-          memory: 256M
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 30s
     depends_on:
       - app
-    volumes:
-      - ./src:/app/src
-      - ./public:/app/public
