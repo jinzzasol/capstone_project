@@ -310,6 +310,11 @@ def get_question(index):
 
 @app.route('/api/submit-code', methods=['POST'])
 def handle_submit():
+    # Clear any existing line-by-line suggestions
+    session['current_code_context'] = ""
+    session['last_indent_level'] = 0
+    session['msg'] = ""
+
     data = request.json
     code = data.get('code')
     questionId = data.get('questionId')
@@ -358,7 +363,8 @@ Please analyze this code submission for:
         return jsonify({
             "message": "Submission received successfully",
             "submissionId": submissionId,
-            "suggestions": analysis
+            "suggestions": analysis,
+            "clearTooltips": True  # Add flag to clear tooltips
         })
         
     except Exception as e:

@@ -167,14 +167,22 @@ const handlePreviousSuggestion = () => {
     return `submission-${timestamp}-${randomPortion}`;
   };
   
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const handleSubmit = async () => {
     const questionId = questions[currentQuestionIndex].id;
     const submissionId = generateRandomSubmissionId();
-    const submissionUrl = 'http://52.91.5.78:7070/api/submit-code'; // Your Flask backend endpoint for code submission
+    const submissionUrl = 'http://52.91.5.78:7070/api/submit-code';
 
     console.log("Submitting Code:", code, "Question ID:", questionId, "Submission ID:", submissionId);
 
     try {
+      setIsSubmitting(true);
+      // Clear tooltips and line highlights
+      setTooltipVisible(false);
+      setHighlightedLine(null);
+      setTooltipText('');
+      
       // Prepare the submission data
       const submissionData = {
         code: code,
@@ -186,7 +194,7 @@ const handlePreviousSuggestion = () => {
       const response = await axios.post(submissionUrl, submissionData);
       console.log("Backend Response:", response.data);
 
-      // Ensure suggestions is always an array
+      // Format suggestions for the suggestions panel
       const receivedSuggestions = response.data.suggestions || [];
       const formattedSuggestions = Array.isArray(receivedSuggestions) 
         ? receivedSuggestions 
@@ -202,6 +210,8 @@ const handlePreviousSuggestion = () => {
         feedback: null
       }]);
       setShowSuggestions(true);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -279,7 +289,11 @@ const handlePreviousSuggestion = () => {
           </div>
           {showSuggestions && (
             <div className="lower-container">
-              <SuggestionsTab suggestions={suggestions} onClose={handleCloseSuggestions} />
+              <SuggestionsTab
+                suggestions={suggestions}
+                onClose={handleCloseSuggestions}
+                isLoading={isSubmitting}
+              />
             </div>
           )}
           <button 
@@ -287,7 +301,7 @@ const handlePreviousSuggestion = () => {
             onClick={handleSubmit}
             style={{ position: 'absolute', right: '20px', bottom: '175px', padding: '10px 20px' }}
           >
-            Submit
+            {isSubmitting ? 'Submitting...' : 'Submit'}
           </button>
         </div>
       </div>

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import '../css/SuggestionsTab.css';
 import axios from 'axios';
 
-function SuggestionsTab({ suggestions = [], onClose = () => {} }) {
+function SuggestionsTab({ suggestions = [], onClose = () => {}, isLoading = false }) {
     // State to manage loading status of feedback submission for each suggestion
     const [loadingFeedback, setLoadingFeedback] = useState({});
     const [feedbackStatus, setFeedbackStatus] = useState({});
@@ -43,23 +43,32 @@ function SuggestionsTab({ suggestions = [], onClose = () => {} }) {
         <div className={`suggestions-container ${!isVisible ? 'hide' : ''}`}>
             <button className="close-btn" onClick={handleClose}>Close</button>
             <div className="suggestions-content">
-                {suggestions.map((suggestion) => (
-                    <div key={suggestion?.id || Math.random()} className="suggestion-item">
-                        <pre><code>{suggestion?.text || ''}</code></pre>
-                        <div className="feedback-buttons">
-                            {feedbackStatus[suggestion?.id]?.loading ? (
-                                <div>Loading...</div>
-                            ) : feedbackStatus[suggestion?.id]?.message ? (
-                                <div>{feedbackStatus[suggestion?.id].message}</div>
-                            ) : (
-                                <>
-                                    <button onClick={() => handleFeedback(suggestion?.id, 'like')}>👍 Like</button>
-                                    <button onClick={() => handleFeedback(suggestion?.id, 'dislike')}>👎 Dislike</button>
-                                </>
-                            )}
-                        </div>
+                {isLoading ? (
+                    <div className="loading-container">
+                        <div className="loading-spinner"></div>
+                        <p>Analyzing your code...</p>
                     </div>
-                ))}
+                ) : (
+                    suggestions.map((suggestion) => (
+                        <div key={suggestion?.id || Math.random()} className="suggestion-item">
+                            <div className="suggestion-text">
+                                {suggestion?.text || ''}
+                            </div>
+                            <div className="feedback-buttons">
+                                {feedbackStatus[suggestion?.id]?.loading ? (
+                                    <div>Loading...</div>
+                                ) : feedbackStatus[suggestion?.id]?.message ? (
+                                    <div>{feedbackStatus[suggestion?.id].message}</div>
+                                ) : (
+                                    <>
+                                        <button onClick={() => handleFeedback(suggestion?.id, 'like')}>👍 Like</button>
+                                        <button onClick={() => handleFeedback(suggestion?.id, 'dislike')}>👎 Dislike</button>
+                                    </>
+                                )}
+                            </div>
+                        </div>
+                    ))
+                )}
             </div>
         </div>
     );
