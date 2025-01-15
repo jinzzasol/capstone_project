@@ -259,232 +259,36 @@ def authorize():
 questions = [
     {
         "id": 1,
-        "title": "Sum of Two Numbers",
-        "description": """Write a function that adds two numbers and returns their sum.
-
-Examples:
-- add_numbers(5, 3) → 8
-- add_numbers(-1, 1) → 0
-- add_numbers(0.5, 1.5) → 2.0
-
-Test Cases:
-1. Positive numbers: add_numbers(10, 20) should return 30
-2. Negative numbers: add_numbers(-5, -7) should return -12
-3. Mixed numbers: add_numbers(-3, 8) should return 5
-4. Zero: add_numbers(0, 5) should return 5
-5. Floating points: add_numbers(0.1, 0.2) should return 0.3
-
-Note: Make sure to handle both integer and floating-point numbers.""",
-        "starterCode": """def add_numbers(a, b):
-    # Your code here
-    pass"""
+        "title": "1. Add Two Numbers",
+        "description": "<p>You are given two non-empty linked lists representing two non-negative integers. The digits are stored in reverse order, and each of their nodes contains a single digit. Add the two numbers and return the sum as a linked list. You may assume the two numbers do not contain any leading zero, except the number 0 itself.</p><p><strong>Example 1:</strong><br />Input: l1 = [2,4,3], l2 = [5,6,4]<br />Output: [7,0,8]<br />Explanation: 342 + 465 = 807.</p><p><strong>Example 2:</strong><br />Input: l1 = [0], l2 = [0]<br />Output: [0]</p><p><strong>Example 3:</strong><br />Input: l1 = [9,9,9,9,9,9,9], l2 = [9,9,9,9]<br />Output: [8,9,9,9,0,0,0,1]</p>",
+        "starterCode": "# Write your Python code here"
     },
     {
         "id": 2,
-        "title": "Reverse a List",
-        "description": """Write a function that reverses a list without using the built-in reverse() method.
-
-Examples:
-- reverse_list([1, 2, 3]) → [3, 2, 1]
-- reverse_list(['a', 'b', 'c']) → ['c', 'b', 'a']
-- reverse_list([]) → []
-
-Test Cases:
-1. Normal list: reverse_list([1, 2, 3, 4, 5])
-2. List with duplicates: reverse_list([1, 1, 2, 2, 3])
-3. Empty list: reverse_list([])
-4. Single element: reverse_list([1])
-5. Mixed types: reverse_list([1, 'a', True])
-
-Note: Try to solve it with O(n) time complexity and O(1) space complexity.""",
-        "starterCode": """def reverse_list(lst):
-    # Your code here
-    pass"""
+        "title": "2. Two Sum",
+        "description": "<p>Given an array of integers <code>nums</code> and an integer <code>target</code>, return indices of the two numbers such that they add up to <code>target</code>.</p><p>You may assume that each input would have <strong>exactly one solution</strong>, and you may not use the same element twice.</p><p>You can return the answer in any order.</p><p><strong>Example 1:</strong><br />Input: nums = [2,7,11,15], target = 9<br />Output: [0,1]<br />Output: Because nums[0] + nums[1] == 9, we return [0, 1].</p>",
+        "starterCode": "# Write your Python code here"
     },
     {
         "id": 3,
-        "title": "Find Prime Numbers",
-        "description": """Write a function that returns all prime numbers up to a given number n.
-
-Examples:
-- get_primes(10) → [2, 3, 5, 7]
-- get_primes(20) → [2, 3, 5, 7, 11, 13, 17, 19]
-- get_primes(0) → []
-
-Test Cases:
-1. Normal case: get_primes(30)
-2. Small number: get_primes(5)
-3. Zero or negative: get_primes(0)
-4. Large number: get_primes(100)
-5. Edge case: get_primes(2)
-
-Note: Try to optimize your solution using the Sieve of Eratosthenes algorithm.""",
-        "starterCode": """def get_primes(n):
-    # Your code here
-    pass"""
+        "title": "3. Longest Substring Without Repeating Characters",
+        "description": "<p>Given a string <code>s</code>, find the length of the <strong>longest substring</strong> without repeating characters.</p><p><strong>Example 1:</strong><br />Input: s = \"abcabcbb\"<br />Output: 3<br />Explanation: The answer is \"abc\", with the length of 3.</p><p><strong>Example 2:</strong><br />Input: s = \"bbbbb\"<br />Output: 1<br />Explanation: The answer is \"b\", with the length of 1.</p>",
+        "starterCode": "# Write your Python code here"
     },
     {
         "id": 4,
-        "title": "Palindrome Check",
-        "description": """Write a function that checks if a given string is a palindrome. A palindrome reads the same backwards as forwards.
-
-Examples:
-- is_palindrome("racecar") → True
-- is_palindrome("hello") → False
-- is_palindrome("A man a plan a canal Panama") → True
-
-Test Cases:
-1. Simple palindrome: is_palindrome("level")
-2. Case sensitivity: is_palindrome("Level")
-3. Spaces and punctuation: is_palindrome("A man, a plan, a canal: Panama")
-4. Empty string: is_palindrome("")
-5. Single character: is_palindrome("a")
-
-Note: 
-- Ignore case sensitivity
-- Remove all non-alphanumeric characters
-- Empty strings are considered palindromes""",
-        "starterCode": """def is_palindrome(text):
-    # Your code here
-    pass"""
+        "title": "4. Median of Two Sorted Arrays",
+        "description": "<p>Given two sorted arrays <code>nums1</code> and <code>nums2</code> of size <code>m</code> and <code>n</code> respectively, return the <strong>median</strong> of the two sorted arrays.</p><p>The overall run time complexity should be <code>O(log (m+n))</code>.</p><p><strong>Example 1:</strong><br />Input: nums1 = [1,3], nums2 = [2]<br />Output: 2.00000<br />Explanation: merged array = [1,2,3] and median is 2.</p><p><strong>Example 2:</strong><br />Input: nums1 = [1,2], nums2 = [3,4]<br />Output: 2.50000<br />Explanation: merged array = [1,2,3,4] and median is (2 + 3) / 2 = 2.5.</p>",
+        "starterCode": "# Write your Python code here"
     },
     {
         "id": 5,
-        "title": "Fibonacci Sequence",
-        "description": """Write a function that returns the nth number in the Fibonacci sequence. The Fibonacci sequence starts with 0, 1, and each subsequent number is the sum of the previous two.
-
-Examples:
-- fibonacci(0) → 0
-- fibonacci(1) → 1
-- fibonacci(6) → 8 (sequence: 0, 1, 1, 2, 3, 5, 8)
-
-Test Cases:
-1. First number: fibonacci(0)
-2. Second number: fibonacci(1)
-3. Normal case: fibonacci(7)
-4. Large number: fibonacci(10)
-5. Edge case: fibonacci(2)
-
-Note: Try to implement both recursive and iterative solutions. Consider which is more efficient for large values of n.""",
-        "starterCode": """def fibonacci(n):
-    # Your code here
-    pass"""
-    },
-    {
-        "id": 6,
-        "title": "Anagram Check",
-        "description": """Write a function that determines if two strings are anagrams. An anagram is a word formed by rearranging the letters of another word.
-
-Examples:
-- are_anagrams("listen", "silent") → True
-- are_anagrams("hello", "world") → False
-- are_anagrams("debit card", "bad credit") → True
-
-Test Cases:
-1. Simple anagrams: are_anagrams("triangle", "integral")
-2. Different lengths: are_anagrams("hello", "world")
-3. Same letters: are_anagrams("aaaa", "aaaa")
-4. Case sensitivity: are_anagrams("Tea", "Eat")
-5. Spaces and punctuation: are_anagrams("debit card", "bad credit")
-
-Note: 
-- Ignore case sensitivity
-- Ignore spaces and punctuation
-- Consider using a dictionary to count characters""",
-        "starterCode": """def are_anagrams(str1, str2):
-    # Your code here
-    pass"""
-    },
-    {
-        "id": 7,
-        "title": "Binary Search",
-        "description": """Implement a binary search function that returns the index of a target element in a sorted array. Return -1 if the element is not found.
-
-Examples:
-- binary_search([1, 2, 3, 4, 5], 3) → 2
-- binary_search([1, 2, 3, 4, 5], 6) → -1
-- binary_search([], 1) → -1
-
-Test Cases:
-1. Element exists: binary_search([1, 3, 5, 7, 9, 11], 7)
-2. Element doesn't exist: binary_search([1, 3, 5, 7, 9], 4)
-3. Empty array: binary_search([], 5)
-4. Single element: binary_search([1], 1)
-5. Duplicate elements: binary_search([1, 2, 2, 2, 3], 2)
-
-Note: Binary search requires the array to be sorted. Time complexity should be O(log n).""",
-        "starterCode": """def binary_search(arr, target):
-    # Your code here
-    pass"""
-    },
-    {
-        "id": 8,
-        "title": "Find Missing Number",
-        "description": """Write a function that finds the missing number in an array containing n distinct numbers taken from 0 to n.
-
-Examples:
-- find_missing([3, 0, 1]) → 2
-- find_missing([9,6,4,2,3,5,7,0,1]) → 8
-- find_missing([0]) → 1
-
-Test Cases:
-1. Normal case: find_missing([0, 1, 3])
-2. Larger sequence: find_missing([0, 1, 2, 4, 5, 6])
-3. Missing first: find_missing([1, 2, 3])
-4. Missing last: find_missing([0, 1, 2])
-5. Single element: find_missing([0])
-
-Note: Try to solve it without using extra space. Consider using the sum formula n * (n+1) / 2.""",
-        "starterCode": """def find_missing(nums):
-    # Your code here
-    pass"""
-    },
-    {
-        "id": 9,
-        "title": "Valid Parentheses",
-        "description": """Write a function that determines if a string of parentheses is valid. Opening brackets must be closed by the same type of closing brackets in the correct order.
-
-Examples:
-- is_valid("()") → True
-- is_valid("()[]{}") → True
-- is_valid("(]") → False
-- is_valid("([)]") → False
-
-Test Cases:
-1. Simple case: is_valid("()")
-2. Multiple types: is_valid("()[]{}")
-3. Nested brackets: is_valid("{[()]}")
-4. Invalid closing: is_valid("([)]")
-5. Unmatched: is_valid("((")
-
-Note: Consider using a stack data structure to solve this problem.""",
-        "starterCode": """def is_valid(s):
-    # Your code here
-    pass"""
-    },
-    {
-        "id": 10,
-        "title": "Merge Sorted Arrays",
-        "description": """Write a function that merges two sorted arrays into a single sorted array.
-
-Examples:
-- merge_arrays([1, 3, 5], [2, 4, 6]) → [1, 2, 3, 4, 5, 6]
-- merge_arrays([1], []) → [1]
-- merge_arrays([], [1]) → [1]
-
-Test Cases:
-1. Normal merge: merge_arrays([1, 3, 5], [2, 4, 6])
-2. Arrays with duplicates: merge_arrays([1, 2, 3], [2, 3, 4])
-3. Empty arrays: merge_arrays([], [])
-4. One empty array: merge_arrays([1, 2], [])
-5. Different lengths: merge_arrays([1], [2, 3, 4])
-
-Note: Try to solve it with O(n+m) time complexity where n and m are the lengths of the input arrays.""",
-        "starterCode": """def merge_arrays(arr1, arr2):
-    # Your code here
-    pass"""
-    }
+        "title": "5. Longest Palindromic Substring",
+        "description": "<p>Given a string <code>s</code>, return the <strong>longest palindromic substring</strong> in <code>s</code>.</p><p><strong>Example 1:</strong><br />Input: s = \"babad\"<br />Output: \"bab\"<br />Note: \"aba\" is also a valid answer.</p><p><strong>"
+	},
+    # Add other questions similarly
 ]
+
 @app.route('/api/questions/<int:index>', methods=['GET'])
 def get_question(index):
     session['current_code_context']=""
@@ -503,54 +307,25 @@ def get_question(index):
         # Add or remove fields as necessary
         'starterCode': question.get('starterCode', '')
     })
-
 @app.route('/api/submit-code', methods=['POST'])
 def handle_submit():
-    try:
-        data = request.json
-        if not data:
-            return jsonify({"error": "No data provided"}), 400
+    data = request.json
+    code = data.get('code')
+    questionId = data.get('questionId')
+    submissionId = data.get('submissionId')
+    question = next((q for q in questions if q["id"] == questionId), None)
+    if question is not None:
+            description = question["description"]
+            msg=parse_code_real_time(code)
+            app.logger.info(msg)
 
-        code = data.get('code')
-        questionId = data.get('questionId')
-        submissionId = data.get('submissionId')
+    # Process the code here, for example, analyze it and generate suggestions
 
-        if not all([code, questionId, submissionId]):
-            return jsonify({"error": "Missing required fields"}), 400
+    suggestions = [{'id': 1, 'text': msg, 'feedback': "Consider using a list comprehension."}]
 
-        # Initialize session variables if they don't exist
-        if 'current_code_context' not in session:
-            session['current_code_context'] = ""
-        if 'last_indent_level' not in session:
-            session['last_indent_level'] = 0
+    # Return the suggestions as part of the response
+    return jsonify({"message": "Submission received successfully", "submissionId": submissionId, "suggestions": msg})
 
-        # Find the question
-        question = next((q for q in questions if q["id"] == questionId), None)
-        if question is None:
-            return jsonify({"error": "Question not found"}), 404
-
-        # Process the code
-        try:
-            msg = parse_code_real_time(code)
-            if not msg:
-                msg = "No suggestions available for this code."
-            app.logger.info(f"Code analysis result: {msg}")
-        except Exception as e:
-            app.logger.error(f"Error analyzing code: {str(e)}")
-            msg = "Error analyzing code. Please try again."
-
-        # Format the response
-        suggestions = [{'id': 1, 'text': msg, 'feedback': None}] if isinstance(msg, str) else msg
-
-        return jsonify({
-            "message": "Submission received successfully",
-            "submissionId": submissionId,
-            "suggestions": suggestions
-        })
-
-    except Exception as e:
-        app.logger.error(f"Error in handle_submit: {str(e)}")
-        return jsonify({"error": "Internal server error"}), 500
 
 @app.route('/api/suggestions/feedback', methods=['POST'])
 def handle_feedback():
@@ -559,6 +334,7 @@ def handle_feedback():
     questionId = data.get('id')
 
     return jsonify({"message": "Feedback recived successfully"})
+
 
 @app.route('/logout')
 @is_logged_in
@@ -589,6 +365,25 @@ def handle_submit_line():
         "message": "Line processed successfully",
         "suggestions": session['msg']
     })
+
+
+# @app.route('/ask', methods=['POST'])
+# def ask():
+#     data = request.json
+#     code_snippet = data['code']
+#     try:
+#         response = openai.Completion.create(
+#             engine="text-davinci-003",
+#             prompt=code_snippet,
+#             temperature=0.7,
+#             max_tokens=150,
+#             top_p=1.0,
+#             frequency_penalty=0.0,
+#             presence_penalty=0.0
+#         )
+#         return jsonify({'response': response.choices[0].text.strip()})
+#     except Exception as e:
+#         return jsonify({'error': str(e)})
 
 def add_line_of_code(new_line):
     session['current_code_context'] += f"\n{new_line}"
@@ -719,41 +514,33 @@ def on_code_segment_completed(code_segment):
 
 
 def parse_code_real_time(new_line):
-    try:
-        current_indent_level = len(new_line) - len(new_line.lstrip())
-        block_ending_keywords = ['return', 'break', 'continue', 'pass', 'raise']
-        
-        if 'last_indent_level' not in session:
+    current_indent_level = len(new_line) - len(new_line.lstrip())
+    block_ending_keywords = ['return', 'break', 'continue', 'pass', 'raise']
+    app.logger.info("last_indent_level " + str(session['last_indent_level']))
+
+    if (any(keyword in new_line for keyword in block_ending_keywords) or current_indent_level < session['last_indent_level']) and session['current_code_context'].strip() != "":
+        try:
+            wrapped_code = wrap_code_block(session['current_code_context'])
+            tree = ast.parse(wrapped_code)
+            for node in ast.walk(tree):
+                if isinstance(node, ast.FunctionDef):
+                    app.logger.info("***********************************************************************************************")
+                    app.logger.info("sending code...................")
+                    return on_code_segment_completed(ast.unparse(node))
+                    #current_code_context = ""
+        except SyntaxError as e:
+            app.logger.info(f"Syntax Error: {e}")
+        finally:
             session['last_indent_level'] = 0
-        if 'current_code_context' not in session:
-            session['current_code_context'] = ""
-
-        app.logger.info(f"Processing code with indent level: {current_indent_level}")
-
-        if (any(keyword in new_line for keyword in block_ending_keywords) or 
-            current_indent_level < session['last_indent_level']) and session['current_code_context'].strip():
-            try:
-                wrapped_code = wrap_code_block(session['current_code_context'])
-                tree = ast.parse(wrapped_code)
-                for node in ast.walk(tree):
-                    if isinstance(node, ast.FunctionDef):
-                        app.logger.info("Found function definition")
-                        return optimize_code_with_chatgpt(ast.unparse(node))
-            except Exception as e:
-                app.logger.error(f"Error parsing code block: {str(e)}")
-                return f"Could not analyze code: {str(e)}"
-
-        # Update session variables
-        session['current_code_context'] += new_line + "\n"
+    else:         
         session['last_indent_level'] = current_indent_level
-        
-        return "Code received and being analyzed..."
 
-    except Exception as e:
-        app.logger.error(f"Error in parse_code_real_time: {str(e)}")
-        return f"Error processing code: {str(e)}"
 
 if __name__ == '__main__':
 	app.secret_key = os.getenv('FLASK_SECRET_KEY', 'your-default-secret-key')
 	port = int(os.environ.get("PORT",7070))
 	app.run(host='0.0.0.0', port=port,use_reloader=True)
+
+     
+    
+    
