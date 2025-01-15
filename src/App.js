@@ -179,9 +179,6 @@ const handlePreviousSuggestion = () => {
     try {
       setIsSubmitting(true);
       // Clear tooltips and line highlights
-      setTooltipVisible(false);
-      setHighlightedLine(null);
-      setTooltipText('');
       
       // Prepare the submission data
       const submissionData = {
@@ -202,6 +199,9 @@ const handlePreviousSuggestion = () => {
 
       setSuggestions(formattedSuggestions);
       setShowSuggestions(true);
+      setTooltipVisible(false);
+      setHighlightedLine(null);
+      setTooltipText('');
     } catch (error) {
       console.error("Error from backend:", error);
       setSuggestions([{
