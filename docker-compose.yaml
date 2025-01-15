@@ -16,9 +16,56 @@ services:
       - GUNICORN_WORKERS=4
       - GUNICORN_TIMEOUT=120
       - CORS_ORIGINS=http://52.91.5.78:3000,http://localhost:3000
-    restart: unless-stopped
+    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7070/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
     logging:
       driver: "json-file"
       options:
         max-size: "10m"
         max-file: "3"
+    volumes:
+      - ./app/logs:/var/log
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.react
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - REACT_APP_API_URL=http://52.91.5.78:7070
+      - WATCHPACK_POLLING=true
+    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    depends_on:
+      - app
+    volumes:
+      - ./src:/app/src
+      - ./public:/app/public

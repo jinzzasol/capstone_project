@@ -382,6 +382,9 @@ def handle_feedback():
 
     return jsonify({"message": "Feedback recived successfully"})
 
+@app.route('/health')
+def health_check():
+    return jsonify({"status": "healthy"}), 200
 
 @app.route('/logout')
 @is_logged_in
