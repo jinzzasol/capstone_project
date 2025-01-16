@@ -178,7 +178,11 @@ const handlePreviousSuggestion = () => {
 
     try {
       setIsSubmitting(true);
-      // Clear tooltips and line highlights
+      // Clear tooltips and line highlights immediately
+      setTooltipVisible(false);
+      setHighlightedLine(null);
+      setTooltipText('');
+      setCurrentSuggestionIndex(-1); // Reset suggestion index
       
       // Prepare the submission data
       const submissionData = {
@@ -199,9 +203,6 @@ const handlePreviousSuggestion = () => {
 
       setSuggestions(formattedSuggestions);
       setShowSuggestions(true);
-      setTooltipVisible(false);
-      setHighlightedLine(null);
-      setTooltipText('');
     } catch (error) {
       console.error("Error from backend:", error);
       setSuggestions([{
@@ -222,14 +223,16 @@ const handlePreviousSuggestion = () => {
 
   // useEffect for suggestion navigation
   useEffect(() => {
-    // Guard against null or undefined suggestions
-    if (!suggestions) {
+    // If submitting or no suggestions, keep tooltips hidden
+    if (isSubmitting || !suggestions || suggestions.length === 0) {
       setTooltipVisible(false);
+      setHighlightedLine(null);
+      setTooltipText('');
       return;
     }
 
-    // Check if we have valid suggestions and a valid index
-    if (suggestions.length > 0 && currentSuggestionIndex >= 0 && currentSuggestionIndex < suggestions.length) {
+    // Only show tooltips if we have suggestions and a valid index
+    if (currentSuggestionIndex >= 0 && currentSuggestionIndex < suggestions.length) {
       const activeSuggestion = suggestions[currentSuggestionIndex];
       
       // Handle case where suggestion might be a string
@@ -248,8 +251,10 @@ const handlePreviousSuggestion = () => {
       setTooltipVisible(true);
     } else {
       setTooltipVisible(false);
+      setHighlightedLine(null);
+      setTooltipText('');
     }
-  }, [currentSuggestionIndex, suggestions]);
+  }, [currentSuggestionIndex, suggestions, isSubmitting]);
   
 
   return (
